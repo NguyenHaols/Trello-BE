@@ -1,0 +1,12 @@
+{
+  "name": "Trello-BE",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "author": "NguyenHao",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "4.18.2"
+  }
+}
