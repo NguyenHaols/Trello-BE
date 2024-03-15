@@ -4,16 +4,22 @@ import express from 'express'
 import exitHook from 'async-exit-hook'
 import { CONNECT_DB, CLOSE_DB, } from '~/config/mongodb'
 import { env } from '~/config/environment'
+import { APIs_V1 } from '~/routes/v1'
+import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 
 
 const START_SERVER = () => {
   const app = express()
 
-  const hostname = 'localhost'
-  const port = 8017
+  app.use(express.json())
 
-  app.get('/', async (req, res) => {
-    // console.log(await GET_DB().listCollections().toArray())
+  app.use('/v1', APIs_V1)
+
+
+  // Middleware
+  app.use(errorHandlingMiddleware)
+
+  app.get('/', (req, res) => {
     res.end('<h1>Hello World!</h1><hr>')
   })
 
@@ -29,7 +35,6 @@ const START_SERVER = () => {
 
 (async () => {
   try {
-    console.log('connecting to MongoDB Cloud Atlas')
     await CONNECT_DB()
     console.log('connected to MongoDB Cloud Atlas')
     START_SERVER()
