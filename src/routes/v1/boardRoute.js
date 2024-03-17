@@ -10,7 +10,12 @@ Router.route('/')
   .get( (req, res) => {
     res.status(StatusCodes.OK).json({ message: 'api get list boards'})
   })
-  
+
   .post(boardValidation.createNew, boardController.createNew)
 
+Router.route('/:id')
+  .get(boardController.getDetail)
+  .put()
+
+  
 export const boardRoute = Router
