@@ -4,6 +4,7 @@ import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { boardModel } from '~/models/boardModel'
+import { cardModel } from '~/models/cardModel'
 
 const createNew = async (reqbody) => {
   try {
@@ -52,7 +53,48 @@ const getDetail = async (columnId) => {
 
 }
 
+const update = async (columnId, reqBody) => {
+  try {
+    const updateData = {
+      ...reqBody,
+      updatedAt: Date.now()
+    }
+    // Lấy dữ liệu từ DB
+    const updatedColumn = await columnModel.update(columnId, updateData)
+
+    return updatedColumn
+  } catch (error) {
+    throw error
+  }
+
+}
+
+const deleteItem = async (columnId) => {
+  try {
+    const targetColumn = await columnModel.findOneById(columnId)
+
+    if (!targetColumn) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Column not found')
+    }
+    // xoa column
+    await columnModel.deleteOneById(columnId)
+
+    // xoa card
+    await cardModel.deleteManyByColumnId(columnId)
+
+    // xoa columnId trong board 
+    await boardModel.pullColumnOrderIds(targetColumn)
+
+    return { deleteResult:'Column and its cards deleted succesfully!' }
+  } catch (error) {
+    throw error
+  }
+
+}
+
 export const columnService = {
   createNew,
-  getDetail
+  getDetail,
+  update,
+  deleteItem
 }
