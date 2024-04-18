@@ -1,0 +1,24 @@
+import jwt from 'jsonwebtoken'
+import { env } from '~/config/environment'
+
+export const generateAccessToken = (user) => {
+  return jwt.sign(
+    {
+      id:user._id,
+      roleId:user.roleId
+    },
+    env.JWT_ACCESS_KEY,
+    { expiresIn: '7d' }
+  )
+}
+
+export const generateRefreshToken = (user) => {
+  return jwt.sign(
+    {
+      id:user._id,
+      roleId:user.roleId
+    },
+    env.JWT_REFESH_KEY,
+    { expiresIn: '365d' }
+  )
+}

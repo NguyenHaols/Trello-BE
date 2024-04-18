@@ -132,7 +132,11 @@ const update = async (boardId, updateData) => {
 const createNew = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
-    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+    const newBoardToAdd = {
+      ...validData,
+      workspaceId: new ObjectId(validData.workspaceId)
+    }
+    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(newBoardToAdd)
     return createdBoard
   } catch (error) {
     throw new Error(error)
