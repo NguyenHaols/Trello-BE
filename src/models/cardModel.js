@@ -2,21 +2,31 @@ import Joi from 'joi'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
+import ApiError from '~/utils/ApiError'
 
 const CARD_COLLECTION_NAME = 'cards'
 const CARD_COLLECTION_SCHEMA = Joi.object({
   boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
   columnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-
+  status: Joi.string().min(3).max(50).trim().strict().default('Good'),
   title: Joi.string().required().min(3).max(50).trim().strict(),
-  description: Joi.string().optional(),
-
+  description: Joi.string().optional().default(''),
+  members: Joi.array().items(
+    Joi.object().unknown(true).default
+  ).default([]),
+  tasks: Joi.array().items(
+    Joi.object().unknown(true).default
+  ).default([]),
+  comments: Joi.array().items(
+    Joi.object().unknown(true).default
+  ).default([]),
+  deadline: Joi.date().timestamp('javascript').default(Date.now),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 })
 
-const INVALID_UPDATE_FIELDS =['_id', 'boardId', 'createdAt']
+const INVALID_UPDATE_FIELDS = ['_id', 'boardId', 'createdAt']
 
 
 const validateBeforeCreate = async (data) => {
@@ -46,39 +56,59 @@ const deleteManyByColumnId = async(columnId) => {
   }
 }
 
-// const getDetail = async(boardId) => {
-//   try {
-//     const result = await GET_DB().collection(CARD_COLLECTION_NAME)
-//       .aggregate([
-//         {
-//           $match: {
-//             _id : new ObjectId(boardId),
-//             _destroy: false
-//           }
-//         },
-//         {
-//           $lookup: {
-//             from: columnModel.CARD_COLLECTION_NAME,
-//             localField: '_id',
-//             foreignField: 'boardId',
-//             as: 'columns'
-//           }
-//         },
-//         {
-//           $lookup: {
-//             from: cardModel.CARD_COLLECTION_NAME,
-//             localField: '_id',
-//             foreignField: 'boardId',
-//             as: 'cards'
-//           }
-//         }
-//       ]).toArray()
+const deleteManyByBoardId = async(boardId) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({
+      boardId: new ObjectId(boardId)
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
-//     return result[0] || null
-//   } catch (error) {
-//     throw new Error(error)
-//   }
-// }
+
+const findUserInCard = async(cardId, userEmail) => {
+  try {
+    const card = await GET_DB().collection(CARD_COLLECTION_NAME).findOne(
+      {
+        _id: new ObjectId(cardId),
+      }
+    )
+    if (card) {
+      const user = card.members.find(member => member.email === userEmail)
+      return user // Trả về user nếu được tìm thấy trong mảng members
+    } else {
+      return null // Trả về null nếu không tìm thấy workspace
+    }
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const addMember = async(cardId, user) => {
+  try {
+    const checkUser = await findUserInCard(cardId, user.email)
+    if ( checkUser ) {
+      throw new Error('User already exist')
+    }
+    const card = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+      {
+        _id: new ObjectId(cardId)
+      },
+      {
+        $push:{
+          members: user
+        }
+      },
+      { returnDocument:'after' }
+    )
+
+    return card
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 const createNew = async (data) => {
   try {
@@ -125,12 +155,64 @@ const update = async (cardId, updateData) => {
   }
 }
 
+const addTask = async (cardId, newTask) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(cardId) },
+      { $push: {tasks: newTask} },
+      { returnDocument:'after' }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const updateTask = async (cardId, taskName, taskStatus) => {
+
+  try {
+    const card = await findOneById(cardId)
+    if (!card) {
+      throw new Error('CardId not found')
+    }
+    const index = card.tasks.findIndex(task => task.taskName === taskName);
+    if (index === -1) {
+      throw new Error('Task not found')
+    }
+    card.tasks[index].taskStatus = taskStatus
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).updateOne(
+      { _id: new ObjectId(cardId) },
+      { $set: { tasks: card.tasks } }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const deleteOneById = async(cardId) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).deleteOne({
+      _id: new ObjectId(cardId)
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   update,
-  deleteManyByColumnId
-  // getDetail
+  deleteManyByColumnId,
+  addMember,
+  deleteOneById,
+  updateTask,
+  addTask,
+  deleteManyByBoardId
 }

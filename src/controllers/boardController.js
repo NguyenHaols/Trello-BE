@@ -46,9 +46,19 @@ const moveCardToDifferentColumn = async(req, res, next) => {
   }
 }
 
+const deleteBoard = async(req, res, next) => {
+  try {
+    const result = await boardService.deleteBoard(req.body)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const boardController= {
   createNew,
   getDetail,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  deleteBoard
 }

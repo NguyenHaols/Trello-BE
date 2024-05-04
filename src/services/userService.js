@@ -77,6 +77,30 @@ const findOneByEmail = async (email) => {
   }
 }
 
+const addStarredBoard = async (reqbody) => {
+  try {
+    const result = await userModel.addStarredBoard(reqbody.userId, reqbody.starredBoardId)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+const removeStarredBoard = async (reqbody) => {
+  try {
+    const result = await userModel.removeStarredBoard(reqbody.userId, reqbody.starredBoardId)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 const findUserDetailById = async(id) => {
   try {
     const user = await userModel.findOneById(id)
@@ -90,8 +114,37 @@ const findUserDetailById = async(id) => {
       userClone.workspaces = cloneWorkspaces
     }
 
-    
     return userClone
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateUser = async(reqbody) => {
+  try {
+    const user = await userModel.updateUser(reqbody)
+    const newUser = cloneDeep(user)
+    delete newUser.password
+    return newUser
+  } catch (error) {
+    throw error
+  }
+}
+
+const updatePassword = async(reqbody) => {
+  try {
+    const user = await checkLogin(reqbody)
+    if ( user._id ) {
+      const salt = await bcrypt.genSalt(10)
+      const hashed = await bcrypt.hash(reqbody.newPassword, salt)
+      const newPassword = hashed
+      const updatedUser = await userModel.updatePassword(reqbody.email, newPassword)
+      const cloneUpdatedUser = cloneDeep(updatedUser)
+      delete cloneUpdatedUser.password
+      return cloneUpdatedUser
+    } else {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Your password is not valid')
+    }
   } catch (error) {
     throw error
   }
@@ -112,12 +165,12 @@ const checkLogin = async(reqBody) => {
       ...user
     }
     delete resUser.password
-
     return validPassword ? resUser : { succes:false, message:'Wrong password' }
   } catch (error) {
     throw error
   }
 }
+
 
 
 export const userService = {
@@ -126,5 +179,9 @@ export const userService = {
   findOneByEmail,
   checkLogin,
   getAll,
-  findUserDetailById
+  findUserDetailById,
+  updateUser,
+  updatePassword,
+  addStarredBoard,
+  removeStarredBoard
 }

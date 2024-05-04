@@ -4,6 +4,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { columnModel } from './columnModel'
 import { cardModel } from './cardModel'
+import { commentModel } from './commentModel'
 
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
@@ -143,6 +144,17 @@ const createNew = async (data) => {
   }
 }
 
+const deleteOneById = async(id) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).deleteOne({
+      _id: new ObjectId(id)
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -151,5 +163,6 @@ export const boardModel = {
   getDetail,
   pushColumnOrderIds,
   pullColumnOrderIds,
-  update
+  update,
+  deleteOneById
 }

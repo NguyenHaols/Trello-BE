@@ -4,6 +4,9 @@ import { columnRoute } from '~/routes/v1/columnRoute'
 import { cardRoute } from '~/routes/v1/cardRoute'
 import { userRoute } from './userRoute'
 import { uploadImage } from './uploadImage'
+import { workspaceRoute } from './workspaceRoute'
+import { commentRoute } from './commentRoute'
+import { emailRoute } from './emailRoute'
 
 const Router = express.Router()
 
@@ -17,5 +20,11 @@ Router.use('/cards', cardRoute)
 Router.use('/users', userRoute)
 
 Router.use('/image', uploadImage)
+
+Router.use('/workspaces', workspaceRoute)
+
+Router.use('/comments', commentRoute)
+
+Router.use('/email', emailRoute)
 
 export const APIs_V1 = Router

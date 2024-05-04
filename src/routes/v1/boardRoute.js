@@ -19,4 +19,7 @@ Router.route('/:id')
 
 Router.route('/supports/movingCard')
   .put(boardValidation.moveCardToDifferentColumn, boardController.moveCardToDifferentColumn)
+
+Router.route('/delete')
+  .post(boardController.deleteBoard)
 export const boardRoute = Router

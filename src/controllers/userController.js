@@ -83,17 +83,16 @@ const requestRefreshToken = async(req, res) => {
         sameSite:'strict'
       })
     }
-    res.status(StatusCodes.OK).json({accessToken: newAccessToken})
+    res.status(StatusCodes.OK).json({ accessToken: newAccessToken })
 
   })
 }
 
 const getUser = async (req, res, next) => {
-  // const token = req.headers.token.split(' ')[1]
   const token = req.cookies.accessToken
   jwt.verify(token, env.JWT_ACCESS_KEY, async(err, decoded) => {
     if (err) {
-      return res.status(StatusCodes.FORBIDDEN).json({error: 'Token is not valid'})
+      return res.status(StatusCodes.FORBIDDEN).json({ error: 'Token is not valid' })
     } else {
       const userdecode = decoded
       const user = await userService.findUserDetailById(userdecode.id)
@@ -106,6 +105,61 @@ const getUser = async (req, res, next) => {
   })
 }
 
+const updateUser = async(req, res, next) => {
+
+  try {
+    const user = await userService.updateUser(req.body)
+    if (user) {
+      return res.status(StatusCodes.OK).json(user)
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json('Update Failed')
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+const addStarredBoard = async(req, res, next) => {
+
+  try {
+    const result = await userService.addStarredBoard(req.body)
+    if (result) {
+      return res.status(StatusCodes.OK).json(result)
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json('Add starred board failure')
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+const removeStarredBoard = async(req, res, next) => {
+
+  try {
+    const result = await userService.removeStarredBoard(req.body)
+    if (result) {
+      return res.status(StatusCodes.OK).json(result)
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json('Remove starred board failure')
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updatePassword = async(req, res, next) => {
+
+  try {
+    const user = await userService.updatePassword(req.body)
+    if (user) {
+      return res.status(StatusCodes.OK).json(user)
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json({message:'Update Failed'})
+    }
+  } catch (error) {
+    next(error)
+  }
+}
 
 
 export const userController= {
@@ -115,5 +169,9 @@ export const userController= {
   logOut,
   getAll,
   requestRefreshToken,
-  getUser
+  getUser,
+  updateUser,
+  updatePassword,
+  addStarredBoard,
+  removeStarredBoard
 }

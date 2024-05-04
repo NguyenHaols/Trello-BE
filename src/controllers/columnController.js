@@ -27,9 +27,7 @@ const update = async(req, res, next) => {
 const deleteItem = async(req, res, next) => {
   try {
     const columnId = req.params.id
-    console.log('🚀 ~ deleteItem ~ columnId:', columnId)
     const result = await columnService.deleteItem(columnId)
-    console.log('🚀 ~ deleteItem ~ result:', result)
 
     res.status(StatusCodes.OK).json(result)
   } catch (error) {

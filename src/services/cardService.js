@@ -4,6 +4,7 @@ import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { columnModel } from '~/models/columnModel'
+import { userModel } from '~/models/userModel'
 
 const createNew = async (reqbody) => {
   try {
@@ -23,6 +24,19 @@ const createNew = async (reqbody) => {
     throw error
   }
 
+}
+
+const updateCard = async(reqbody) => {
+  try {
+    const dataUpdate = {
+      ...reqbody
+    }
+    delete dataUpdate._id
+    const result = cardModel.update(reqbody._id,dataUpdate)
+    return result
+  } catch (error) {
+    throw error
+  }
 }
 
 const getDetail = async (cardId) => {
@@ -48,7 +62,71 @@ const getDetail = async (cardId) => {
 
 }
 
+const addMember = async(reqBody) => {
+  try {
+    const user = await userModel.findOneByEmail(reqBody.email)
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+    }
+    const cloneUser = {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      avatar: user.avatar
+    }
+
+    const card = await cardModel.addMember(reqBody.cardId, cloneUser)
+    if (!card) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'workspace not found')
+    }
+    return card
+  } catch (error) {
+    throw error
+  }
+}
+
+const deleteCard = async(reqbody) => {
+  try {
+    const result = await cardModel.deleteOneById(reqbody._id)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Card not found')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateTask = async(reqbody) => {
+  try {
+    const result = await cardModel.updateTask(reqbody.cardId,reqbody.taskName,reqbody.taskStatus)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Update failure')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+const addTask= async(reqbody) => {
+  try {
+    const result = await cardModel.addTask(reqbody.cardId,reqbody.newTask)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Add task failure')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 export const cardService = {
   createNew,
-  getDetail
+  getDetail,
+  addMember,
+  updateCard,
+  deleteCard,
+  updateTask,
+  addTask
 }

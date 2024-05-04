@@ -13,6 +13,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   password: Joi.string().required().min(5).trim().strict(),
   roleId: Joi.string().default('1'),
   avatar:Joi.string().default('').optional(),
+  phoneNumber: Joi.string().required().min(9).max(11).trim().strict(),
   starredBoard: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -69,6 +70,67 @@ const getAll = async() => {
   }
 }
 
+const updateUser = async (newData) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { email: newData.email },
+      { $set: {
+        username: newData.username,
+        phoneNumber : newData.phoneNumber,
+        avatar: newData.avatar,
+        updatedAt: Date.now()
+      } },
+      { returnDocument:'after' }
+    )
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const addStarredBoard = async (userId, starredBoardId) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(userId)},
+      { $addToSet: {starredBoard : starredBoardId} },
+      { returnDocument:'after' }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const removeStarredBoard = async (userId, starredBoardId) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(userId)},
+      { $pull: {starredBoard : starredBoardId} },
+      { returnDocument:'after' }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const updatePassword = async (email, newPassword) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { email: email },
+      { $set: {
+        password : newPassword,
+        updatedAt: Date.now()
+      } },
+      { returnDocument:'after' }
+    )
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 
 
@@ -77,5 +139,9 @@ export const userModel = {
   createNew,
   findOneById,
   findOneByEmail,
-  getAll
+  getAll,
+  updateUser,
+  updatePassword,
+  addStarredBoard,
+  removeStarredBoard
 }

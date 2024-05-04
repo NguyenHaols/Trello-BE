@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
+import { commentService } from './commentService'
 
 const createNew = async (reqbody) => {
   try {
@@ -34,10 +35,17 @@ const getDetail = async (boardId) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     }
 
+    const comments = await commentService.getAll()
+
     // Clone lại từ dữ liệu ban đầu và sửa lại cấu trúc dữ liệu trả ra
     const resBoard = cloneDeep(board)
     resBoard.columns.forEach(column => {
       column.cards = resBoard.cards.filter(card => card.columnId.equals(column._id))
+      column.cards.forEach(card => {
+        card.comments = comments.filter(
+          comment => comment.cardId.toString() === card._id.toString()
+        ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      })
     })
     delete resBoard.cards
 
@@ -83,7 +91,34 @@ const moveCardToDifferentColumn = async (reqBody) => {
       columnId: reqBody.nextColumnId
     })
 
-    return {updateResponse:'Success'}
+    return { updateResponse:'Success' }
+  } catch (error) {
+    throw error
+  }
+
+}
+
+const deleteBoard = async (reqBody) => {
+  try {
+    const result = await boardModel.deleteOneById(reqBody.boardId)
+
+    if (result.deletedCount === 0 ) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Delete board failure')
+    }
+
+    const board = await boardModel.findOneById(reqBody.boardId)
+
+    if (board) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Delete board failure')
+    }
+    // xoa column
+    await columnModel.deleteManyByBoardId(reqBody.boardId)
+
+    // xoa card
+    await cardModel.deleteManyByBoardId(reqBody.boardId)
+
+
+    return { message:'Board deleted succesfully!' }
   } catch (error) {
     throw error
   }
@@ -91,10 +126,10 @@ const moveCardToDifferentColumn = async (reqBody) => {
 }
 
 
-
 export const boardService = {
   createNew,
   getDetail,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  deleteBoard
 }

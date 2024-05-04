@@ -23,4 +23,16 @@ Router.route('/refreshToken')
 Router.route('/getUser')
   .get(userController.getUser)
 
+Router.route('/update')
+  .post( userValidation.update, verifyTokenUser, userController.updateUser)
+
+Router.route('/updatePassword')
+  .post( userValidation.updatePassword, verifyTokenUser, userController.updatePassword)
+
+Router.route('/addStarred')
+  .post(userController.addStarredBoard)
+
+Router.route('/removeStarred')
+  .post(userController.removeStarredBoard)
+
 export const userRoute = Router
