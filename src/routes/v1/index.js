@@ -7,9 +7,9 @@ import { uploadImage } from './uploadImage'
 import { workspaceRoute } from './workspaceRoute'
 import { commentRoute } from './commentRoute'
 import { emailRoute } from './emailRoute'
+import { codeRecoverRoute } from './codeRecoverRoute'
 
 const Router = express.Router()
-
 
 Router.use('/boards', boardRoute)
 
@@ -26,5 +26,8 @@ Router.use('/workspaces', workspaceRoute)
 Router.use('/comments', commentRoute)
 
 Router.use('/email', emailRoute)
+
+Router.use('/codeRecover', codeRecoverRoute)
+
 
 export const APIs_V1 = Router
