@@ -3,9 +3,8 @@ import { userService } from '~/services/userService'
 import { generateAccessToken, generateRefreshToken } from '~/utils/Token'
 import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
-import Cookies from 'js-cookie'
 
-const getAll = async(req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
     const Users = await userService.getAll()
     res.status(StatusCodes.OK).json(Users)
@@ -14,7 +13,7 @@ const getAll = async(req, res, next) => {
   }
 }
 
-const createNew = async(req, res, next) => {
+const createNew = async (req, res, next) => {
   try {
     const createUser = await userService.createNew(req.body)
     res.status(StatusCodes.CREATED).json(createUser)
@@ -23,7 +22,7 @@ const createNew = async(req, res, next) => {
   }
 }
 
-const findOneByEmail = async(req, res, next) => {
+const findOneByEmail = async (req, res, next) => {
   try {
     const user = await userService.findOneByEmail(req.body.email)
 
@@ -33,7 +32,7 @@ const findOneByEmail = async(req, res, next) => {
   }
 }
 
-const login = async(req, res, next) => {
+const login = async (req, res, next) => {
   try {
     let accessToken = null
     let refreshToken = null
@@ -42,14 +41,14 @@ const login = async(req, res, next) => {
       accessToken = generateAccessToken(user)
       refreshToken = generateRefreshToken(user)
       res.cookie('refreshToken', refreshToken, {
-        httpOnly:true,
-        path:'/',
-        sameSite:'None'
+        httpOnly: true,
+        path: '/',
+        sameSite: 'None'
       })
       res.cookie('accessToken', accessToken, {
-        httpOnly:true,
-        path:'/',
-        sameSite:'None'
+        httpOnly: true,
+        path: '/',
+        sameSite: 'None'
       })
     }
 
@@ -59,14 +58,15 @@ const login = async(req, res, next) => {
   }
 }
 
-const logOut = async(req, res, next) => {
+const logOut = async (req, res, next) => {
   res.clearCookie('refreshToken')
   res.status(StatusCodes.OK).json('LogOut successfully')
 }
 
-const requestRefreshToken = async(req, res) => {
+const requestRefreshToken = async (req, res) => {
   const refeshToken = req.cookies.refeshToken
-  if (!refeshToken) return res.status(StatusCodes.UNAUTHORIZED).json('your not authenticated')
+  if (!refeshToken)
+    return res.status(StatusCodes.UNAUTHORIZED).json('your not authenticated')
   jwt.verify(refeshToken, env.JWT_REFESH_KEY, (err, user) => {
     let newAccessToken
     let newRefeshToken
@@ -74,39 +74,31 @@ const requestRefreshToken = async(req, res) => {
       console.log(err)
     } else {
       // if dont err , create new token and refesh token
-      newAccessToken= generateAccessToken(user)
+      newAccessToken = generateAccessToken(user)
       newRefeshToken = generateRefreshToken(user)
       res.cookie('refeshToken', newRefeshToken, {
-        httpOnly:true,
-        secure:false,
-        path:'/',
-        sameSite:'strict'
+        httpOnly: true,
+        secure: false,
+        path: '/',
+        sameSite: 'strict'
       })
     }
     res.status(StatusCodes.OK).json({ accessToken: newAccessToken })
-
   })
 }
 
 const getUser = async (req, res, next) => {
-  const token = req.cookies.accessToken
-  jwt.verify(token, env.JWT_ACCESS_KEY, async(err, decoded) => {
-    if (err) {
-      return res.status(StatusCodes.FORBIDDEN).json({ error: 'Token is not valid' })
-    } else {
-      const userdecode = decoded
-      const user = await userService.findUserDetailById(userdecode.id)
-      if (user) {
-        return res.status(StatusCodes.OK).json(user)
-      } else {
-        return res.status(StatusCodes.OK).json('user is not exist')
-      }
+  try {
+    const user = await userService.findUserDetailById(req.user.id)
+    if (user) {
+      return res.status(StatusCodes.OK).json(user)
     }
-  })
+  } catch (error) {
+    return res.status(StatusCodes.NOT_FOUND).json('user is not exist')
+  }
 }
 
-const updateUser = async(req, res, next) => {
-
+const updateUser = async (req, res, next) => {
   try {
     const user = await userService.updateUser(req.body)
     if (user) {
@@ -119,8 +111,7 @@ const updateUser = async(req, res, next) => {
   }
 }
 
-const addStarredBoard = async(req, res, next) => {
-
+const addStarredBoard = async (req, res, next) => {
   try {
     const result = await userService.addStarredBoard(req.body)
     if (result) {
@@ -133,36 +124,37 @@ const addStarredBoard = async(req, res, next) => {
   }
 }
 
-const removeStarredBoard = async(req, res, next) => {
-
+const removeStarredBoard = async (req, res, next) => {
   try {
     const result = await userService.removeStarredBoard(req.body)
     if (result) {
       return res.status(StatusCodes.OK).json(result)
     } else {
-      return res.status(StatusCodes.NOT_FOUND).json('Remove starred board failure')
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json('Remove starred board failure')
     }
   } catch (error) {
     next(error)
   }
 }
 
-const updatePassword = async(req, res, next) => {
-
+const updatePassword = async (req, res, next) => {
   try {
     const user = await userService.updatePassword(req.body)
     if (user) {
       return res.status(StatusCodes.OK).json(user)
     } else {
-      return res.status(StatusCodes.NOT_FOUND).json({message:'Update Failed'})
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Update Failed' })
     }
   } catch (error) {
     next(error)
   }
 }
 
-
-export const userController= {
+export const userController = {
   createNew,
   findOneByEmail,
   login,
