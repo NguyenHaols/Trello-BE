@@ -15,6 +15,16 @@ const createNew = async (reqBody) => {
   }
 }
 
+const getAll = async () => {
+  try {
+    const roles = await roleModel.getAll()
+    return roles
+  } catch (error) {
+    throw error
+  }
+}
+
 export const roleService = {
-  createNew
+  createNew,
+  getAll
 }

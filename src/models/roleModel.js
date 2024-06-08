@@ -29,8 +29,21 @@ const createNew = async (data) => {
   }
 }
 
+const getAll = async () => {
+  try {
+    const result = await GET_DB()
+      .collection(ROLE_COLLECTION_NAME)
+      .find({})
+      .toArray()
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const roleModel = {
   ROLE_COLLECTION_NAME,
   ROLE_COLLECTION_SCHEMA,
-  createNew
+  createNew,
+  getAll
 }

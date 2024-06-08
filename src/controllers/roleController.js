@@ -10,6 +10,16 @@ const createNew = async (req, res, next) => {
   }
 }
 
+const getAll = async (req, res, next) => {
+  try {
+    const roles = await roleService.getAll()
+    res.status(StatusCodes.OK).json(roles)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const roleController = {
-  createNew
+  createNew,
+  getAll
 }

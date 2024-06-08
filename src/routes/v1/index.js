@@ -8,6 +8,7 @@ import { workspaceRoute } from './workspaceRoute'
 import { commentRoute } from './commentRoute'
 import { emailRoute } from './emailRoute'
 import { codeRecoverRoute } from './codeRecoverRoute'
+import { roleRoute } from './roleRoute'
 
 const Router = express.Router()
 
@@ -29,5 +30,6 @@ Router.use('/email', emailRoute)
 
 Router.use('/codeRecover', codeRecoverRoute)
 
+Router.use('/roles', roleRoute)
 
 export const APIs_V1 = Router

@@ -38,7 +38,7 @@ const login = async (req, res, next) => {
     let refreshToken = null
     const user = await userService.checkLogin(req.body)
     if (user._id) {
-      accessToken = generateAccessToken(user)
+      accessToken = generateAccessToken(user, req.body)
       refreshToken = generateRefreshToken(user)
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
