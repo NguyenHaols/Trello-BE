@@ -37,8 +37,8 @@ export const verifyTokenAdmin = (req, res, next) => {
   })
 }
 
-export const verifyTokenManager = () => {
-  verifyTokenUser(async (req, res, next) => {
+export const verifyTokenManager = (req, res, next) => {
+  verifyTokenUser(req, res, async () => {
     const userId = req.user.id
     const workspaceId = req.body.workspaceId
     const result = await workspaceService.findManagerById(userId, workspaceId)

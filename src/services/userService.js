@@ -8,13 +8,12 @@ import { cloneDeep } from 'lodash'
 import { workspaceModel } from '~/models/workspaceModel'
 
 const createNew = async (reqbody) => {
-
   try {
     const salt = await bcrypt.genSalt(10)
     const hashed = await bcrypt.hash(reqbody.password, salt)
     const newUser = {
       ...reqbody,
-      password:hashed,
+      password: hashed,
       slug: slugify(reqbody.username)
     }
 
@@ -25,17 +24,14 @@ const createNew = async (reqbody) => {
   } catch (error) {
     throw error
   }
-
 }
 
 const getAll = async () => {
   try {
     const users = await userModel.getAll()
-    const resUsers = [
-      ...users
-    ]
+    const resUsers = [...users]
 
-    resUsers.forEach(user => {
+    resUsers.forEach((user) => {
       delete user.password
     })
 
@@ -56,7 +52,7 @@ const findOneById = async (id) => {
     }
     delete resUser.password
 
-    if (!resUser) {
+    if (!user) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
     }
     return resUser
@@ -79,7 +75,10 @@ const findOneByEmail = async (email) => {
 
 const addStarredBoard = async (reqbody) => {
   try {
-    const result = await userModel.addStarredBoard(reqbody.userId, reqbody.starredBoardId)
+    const result = await userModel.addStarredBoard(
+      reqbody.userId,
+      reqbody.starredBoardId
+    )
     if (!result) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
     }
@@ -91,7 +90,10 @@ const addStarredBoard = async (reqbody) => {
 
 const removeStarredBoard = async (reqbody) => {
   try {
-    const result = await userModel.removeStarredBoard(reqbody.userId, reqbody.starredBoardId)
+    const result = await userModel.removeStarredBoard(
+      reqbody.userId,
+      reqbody.starredBoardId
+    )
     if (!result) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
     }
@@ -101,7 +103,7 @@ const removeStarredBoard = async (reqbody) => {
   }
 }
 
-const findUserDetailById = async(id) => {
+const findUserDetailById = async (id) => {
   try {
     const user = await userModel.findOneById(id)
     const userClone = cloneDeep(user)
@@ -109,7 +111,9 @@ const findUserDetailById = async(id) => {
     if (!user) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id user not found')
     } else {
-      const workspaces = await workspaceModel.getWorkspacesIncludeMemberId(user._id)
+      const workspaces = await workspaceModel.getWorkspacesIncludeMemberId(
+        user._id
+      )
       const cloneWorkspaces = cloneDeep(workspaces)
       userClone.workspaces = cloneWorkspaces
     }
@@ -120,7 +124,7 @@ const findUserDetailById = async(id) => {
   }
 }
 
-const updateUser = async(reqbody) => {
+const updateUser = async (reqbody) => {
   try {
     const user = await userModel.updateUser(reqbody)
     const newUser = cloneDeep(user)
@@ -131,14 +135,17 @@ const updateUser = async(reqbody) => {
   }
 }
 
-const updatePassword = async(reqbody) => {
+const updatePassword = async (reqbody) => {
   try {
     const user = await checkLogin(reqbody)
-    if ( user._id ) {
+    if (user._id) {
       const salt = await bcrypt.genSalt(10)
       const hashed = await bcrypt.hash(reqbody.newPassword, salt)
       const newPassword = hashed
-      const updatedUser = await userModel.updatePassword(reqbody.email, newPassword)
+      const updatedUser = await userModel.updatePassword(
+        reqbody.email,
+        newPassword
+      )
       const cloneUpdatedUser = cloneDeep(updatedUser)
       delete cloneUpdatedUser.password
       return cloneUpdatedUser
@@ -150,28 +157,25 @@ const updatePassword = async(reqbody) => {
   }
 }
 
-const checkLogin = async(reqBody) => {
+const checkLogin = async (reqBody) => {
   try {
     const user = await userModel.findOneByEmail(reqBody.email)
     if (!user) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
     }
-    const validPassword = await bcrypt.compare(
-      reqBody.password,
-      user.password
-    )
+    const validPassword = await bcrypt.compare(reqBody.password, user.password)
 
     const resUser = {
       ...user
     }
     delete resUser.password
-    return validPassword ? resUser : { succes:false, message:'Wrong password' }
+    return validPassword
+      ? resUser
+      : { succes: false, message: 'Wrong password' }
   } catch (error) {
     throw error
   }
 }
-
-
 
 export const userService = {
   createNew,
