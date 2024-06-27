@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
 
-export const generateAccessToken = (user) => {
+export const generateAccessToken = (user, body) => {
   return jwt.sign(
     {
-      id:user._id,
-      roleId:user.roleId
+      id: user._id,
+      roleId: user.roleId,
+      body: body
     },
     env.JWT_ACCESS_KEY,
     { expiresIn: '7d' }
@@ -15,8 +16,8 @@ export const generateAccessToken = (user) => {
 export const generateRefreshToken = (user) => {
   return jwt.sign(
     {
-      id:user._id,
-      roleId:user.roleId
+      id: user._id,
+      roleId: user.roleId
     },
     env.JWT_REFESH_KEY,
     { expiresIn: '365d' }

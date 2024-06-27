@@ -1,8 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { workspaceService } from '~/services/workspaceService'
 
-const addMember = async(req, res, next) => {
-
+const addMember = async (req, res, next) => {
   try {
     const result = await workspaceService.addMember(req.body)
     if (result) {
@@ -13,10 +12,9 @@ const addMember = async(req, res, next) => {
   } catch (error) {
     next(error)
   }
-
 }
 
-const removeMember = async(req, res, next) => {
+const removeMember = async (req, res, next) => {
   try {
     const result = await workspaceService.removeMember(req.body)
     if (result) {
@@ -29,7 +27,7 @@ const removeMember = async(req, res, next) => {
   }
 }
 
-const createWorkspace = async(req, res, next) => {
+const createWorkspace = async (req, res, next) => {
   try {
     const result = await workspaceService.createWorkspace(req.body)
     if (result) {
@@ -42,7 +40,7 @@ const createWorkspace = async(req, res, next) => {
   }
 }
 
-const update = async(req, res, next) => {
+const update = async (req, res, next) => {
   try {
     const result = await workspaceService.update(req.body)
     if (result) {
@@ -55,24 +53,47 @@ const update = async(req, res, next) => {
   }
 }
 
-
-const deleteWorkspace = async(req, res, next) => {
+const deleteWorkspace = async (req, res, next) => {
   try {
     const result = await workspaceService.deleteOneById(req.body)
     if (result) {
-      return res.status(StatusCodes.OK).json({message:'Delete successfully'})
+      return res.status(StatusCodes.OK).json({ message: 'Delete successfully' })
     } else {
-      return res.status(StatusCodes.NOT_FOUND).json({message:'Delete Failure'})
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Delete Failure' })
     }
   } catch (error) {
     next(error)
   }
 }
 
+const getAll = async (req, res, next) => {
+  try {
+    const workspaces = await workspaceService.getAll()
+    return res.status(StatusCodes.OK).json(workspaces)
+  } catch (error) {
+    next(error)
+  }
+}
+
+// const findManagerById = async (req, res, next, userId, workspaceId) => {
+//   try {
+//     const isManager = await workspaceService.findManagerById(
+//       userId,
+//       workspaceId
+//     )
+//     return isManager
+//   } catch (error) {
+//     next()
+//   }
+// }
+
 export const workspaceController = {
   addMember,
   removeMember,
   createWorkspace,
   update,
-  deleteWorkspace
+  deleteWorkspace,
+  getAll
 }

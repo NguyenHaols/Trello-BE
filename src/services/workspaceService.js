@@ -6,7 +6,7 @@ import { workspaceModel } from '~/models/workspaceModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatter'
 
-const addMember = async(reqBody) => {
+const addMember = async (reqBody) => {
   try {
     const user = await userModel.findOneByEmail(reqBody.email)
     if (!user) {
@@ -19,7 +19,10 @@ const addMember = async(reqBody) => {
       avatar: user.avatar
     }
 
-    const workspace = await workspaceModel.addMember(reqBody.workspaceId, cloneUser)
+    const workspace = await workspaceModel.addMember(
+      reqBody.workspaceId,
+      cloneUser
+    )
     if (!workspace) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'workspace not found')
     }
@@ -29,9 +32,12 @@ const addMember = async(reqBody) => {
   }
 }
 
-const removeMember = async(reqbody) => {
+const removeMember = async (reqbody) => {
   try {
-    const result = await workspaceModel.removeMember(reqbody.workspaceId, reqbody.email)
+    const result = await workspaceModel.removeMember(
+      reqbody.workspaceId,
+      reqbody.email
+    )
     if (!result) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'workspace not found')
     }
@@ -41,27 +47,29 @@ const removeMember = async(reqbody) => {
   }
 }
 
-const createWorkspace = async(reqbody) => {
+const createWorkspace = async (reqbody) => {
   try {
     const newWorkspace = {
       ...reqbody,
       slug: slugify(reqbody.title)
     }
     const createdWorkspace = await workspaceModel.createWorkspace(newWorkspace)
-    const getNewWorkspace = await workspaceModel.findOneById(createdWorkspace.insertedId)
+    const getNewWorkspace = await workspaceModel.findOneById(
+      createdWorkspace.insertedId
+    )
     return getNewWorkspace
   } catch (error) {
     throw error
   }
 }
 
-const update = async(reqbody) => {
+const update = async (reqbody) => {
   try {
     const newData = {
       ...reqbody
     }
     delete newData._id
-    
+
     const updated = await workspaceModel.update(reqbody._id, newData)
     if (!updated) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Workspace not found')
@@ -72,7 +80,7 @@ const update = async(reqbody) => {
   }
 }
 
-const deleteOneById = async(reqbody) => {
+const deleteOneById = async (reqbody) => {
   try {
     const result = await workspaceModel.deleteOneById(reqbody._id)
     if (!result) {
@@ -84,10 +92,29 @@ const deleteOneById = async(reqbody) => {
   }
 }
 
+const getAll = async () => {
+  try {
+    const result = await workspaceModel.getAll()
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Workspace not found')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+const findManagerById = async (userId, workspaceId) => {
+  let isManager = await workspaceModel.findManagerById(userId, workspaceId)
+  return isManager
+}
+
 export const workspaceService = {
   addMember,
   removeMember,
   createWorkspace,
   update,
-  deleteOneById
+  deleteOneById,
+  getAll,
+  findManagerById
 }

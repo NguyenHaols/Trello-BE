@@ -4,49 +4,60 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { columnModel } from './columnModel'
 import { cardModel } from './cardModel'
-import { commentModel } from './commentModel'
 
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
-  workspaceId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-  ownerId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  workspaceId: Joi.string()
+    .required()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE),
+  ownerId: Joi.string()
+    .required()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE),
   title: Joi.string().required().min(3).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
   description: Joi.string().required().min(3).max(256).trim().strict(),
-  avatar:Joi.string().default('').optional(),
+  avatar: Joi.string().default('').optional(),
   type: Joi.string().valid('Public', 'Private').required(),
-  columnOrderIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
+  columnOrderIds: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    .default([]),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
-
 })
 
 // Những field không được update
-const INVALID_UPDATE_FIELDS =['_id', 'createdAt']
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
 
 const validateBeforeCreate = async (data) => {
-  return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly:false })
+  return await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
+    abortEarly: false
+  })
 }
 
-const findOneById = async(id) => {
+const findOneById = async (id) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-      _id: new ObjectId(id)
-    })
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOne({
+        _id: new ObjectId(id)
+      })
     return result
   } catch (error) {
     throw new Error(error)
   }
 }
 
-const getDetail = async(boardId) => {
+const getDetail = async (boardId) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME)
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
       .aggregate([
         {
           $match: {
-            _id : new ObjectId(boardId),
+            _id: new ObjectId(boardId),
             _destroy: false
           }
         },
@@ -66,7 +77,8 @@ const getDetail = async(boardId) => {
             as: 'cards'
           }
         }
-      ]).toArray()
+      ])
+      .toArray()
 
     return result[0] || null
   } catch (error) {
@@ -77,11 +89,13 @@ const getDetail = async(boardId) => {
 // update giá trị columnOrderIds vao cuoi mang
 const pushColumnOrderIds = async (column) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
-      { _id: new ObjectId(column.boardId) },
-      { $push: { columnOrderIds: new ObjectId(column._id) } },
-      { returnDocument:'after' }
-    )
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(column.boardId) },
+        { $push: { columnOrderIds: new ObjectId(column._id) } },
+        { returnDocument: 'after' }
+      )
 
     return result
   } catch (error) {
@@ -91,11 +105,13 @@ const pushColumnOrderIds = async (column) => {
 
 const pullColumnOrderIds = async (column) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
-      { _id: new ObjectId(column.boardId) },
-      { $pull: { columnOrderIds: new ObjectId(column._id) } },
-      { returnDocument:'after' }
-    )
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(column.boardId) },
+        { $pull: { columnOrderIds: new ObjectId(column._id) } },
+        { returnDocument: 'after' }
+      )
 
     return result
   } catch (error) {
@@ -104,25 +120,27 @@ const pullColumnOrderIds = async (column) => {
 }
 
 const update = async (boardId, updateData) => {
-
   try {
-
     // Lọc ra fields không được sửa
-    Object.keys(updateData).forEach( key => {
+    Object.keys(updateData).forEach((key) => {
       if (INVALID_UPDATE_FIELDS.includes(key)) {
         delete updateData[key]
       }
     })
 
     if (updateData.columnOrderIds) {
-      updateData.columnOrderIds = updateData.columnOrderIds.map(_id => (new ObjectId(_id)))
+      updateData.columnOrderIds = updateData.columnOrderIds.map(
+        (_id) => new ObjectId(_id)
+      )
     }
 
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
-      { _id: new ObjectId(boardId) },
-      { $set: updateData },
-      { returnDocument:'after' }
-    )
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(boardId) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      )
 
     return result
   } catch (error) {
@@ -137,18 +155,22 @@ const createNew = async (data) => {
       ...validData,
       workspaceId: new ObjectId(validData.workspaceId)
     }
-    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(newBoardToAdd)
+    const createdBoard = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .insertOne(newBoardToAdd)
     return createdBoard
   } catch (error) {
     throw new Error(error)
   }
 }
 
-const deleteOneById = async(id) => {
+const deleteOneById = async (id) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).deleteOne({
-      _id: new ObjectId(id)
-    })
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .deleteOne({
+        _id: new ObjectId(id)
+      })
     return result
   } catch (error) {
     throw new Error(error)

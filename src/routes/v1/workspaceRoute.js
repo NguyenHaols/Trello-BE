@@ -1,29 +1,30 @@
 import express from 'express'
 import { workspaceController } from '~/controllers/workspaceController'
+import { verifyTokenAdmin, verifyTokenManager } from '~/middlewares/verifyToken'
 import { workspaceValidation } from '~/validations/workspaceValidation'
-
 
 const Router = express.Router()
 
-Router.route('/addMember')
+Router.route('/addMember').post(
+  verifyTokenManager,
+  workspaceController.addMember
+)
 
-  .post(workspaceController.addMember)
+Router.route('/removeMember').post(workspaceController.removeMember)
 
-Router.route('/removeMember')
+Router.route('/createWorkspace').post(
+  workspaceValidation.createNew,
+  workspaceController.createWorkspace
+)
 
-  .post(workspaceController.removeMember)
+Router.route('/update').post(
+  verifyTokenManager,
+  workspaceValidation.update,
+  workspaceController.update
+)
 
-Router.route('/createWorkspace')
+Router.route('/delete').post(workspaceController.deleteWorkspace)
 
-  .post(workspaceValidation.createNew, workspaceController.createWorkspace)
-
-Router.route('/update')
-
-  .post(workspaceValidation.update, workspaceController.update)
-
-Router.route('/delete')
-
-  .post(workspaceController.deleteWorkspace)
-
+Router.route('/getAll').get(verifyTokenAdmin, workspaceController.getAll)
 
 export const workspaceRoute = Router
