@@ -142,6 +142,7 @@ const getWorkspacesIncludeMemberId = async (memberId) => {
         }
       ])
       .toArray()
+    console.log(result)
     return result
   } catch (error) {
     throw new Error(error)

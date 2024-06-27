@@ -161,7 +161,10 @@ const checkLogin = async (reqBody) => {
   try {
     const user = await userModel.findOneByEmail(reqBody.email)
     if (!user) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'User username or password wrong'
+      )
     }
     const validPassword = await bcrypt.compare(reqBody.password, user.password)
 
