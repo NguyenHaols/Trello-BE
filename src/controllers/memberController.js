@@ -3,8 +3,8 @@ import { memberService } from '~/services/membersService'
 
 const addNew = async (req, res, next) => {
   try {
-    const { workspaceId, userId } = req.body
-    const newMember = await memberService.addMember(workspaceId, userId)
+    const { workspaceId, email } = req.body
+    const newMember = await memberService.addMember(workspaceId, email)
     res.status(StatusCodes.OK).json(newMember)
   } catch (error) {
     next(error)
@@ -13,9 +13,20 @@ const addNew = async (req, res, next) => {
 
 const removeMember = async (req, res, next) => {
   try {
-    const { workspaceId, userId } = req.body
-    const newMember = await memberService.removeMember(workspaceId, userId)
+    const { workspaceId, email } = req.body
+    const newMember = await memberService.removeMember(workspaceId, email)
     res.status(StatusCodes.OK).json(newMember)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getMembersByWorkspaceId = async(req, res, next) => {
+  try {
+    const workspaceId = req.params.id
+    const members = await memberService.getMembersByWorkspaceId(workspaceId)
+    res.status(StatusCodes.OK).json(members)
+    return members
   } catch (error) {
     next(error)
   }
@@ -23,5 +34,6 @@ const removeMember = async (req, res, next) => {
 
 export const memberController = {
   addNew,
-  removeMember
+  removeMember,
+  getMembersByWorkspaceId
 }

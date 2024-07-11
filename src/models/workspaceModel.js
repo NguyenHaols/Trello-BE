@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { boardModel } from './boardModel'
 import { userModel } from './userModel'
+import { memberModel } from './memberModel'
 
 const WORKSPACE_COLLECTION_NAME = 'workspaces'
 const WORKSPACE_COLLECTION_SCHEMA = Joi.object({
@@ -16,7 +17,7 @@ const WORKSPACE_COLLECTION_SCHEMA = Joi.object({
   slug: Joi.string().required().min(3).trim().strict(),
   avatar: Joi.string().default('').optional(),
   type: Joi.string().valid('Public', 'Private').required(),
-  members: Joi.array().items(Joi.object().unknown(true).default).default([]),
+  // members: Joi.array().items(Joi.object().unknown(true).default).default([]),
   managers: Joi.array().items(Joi.object().unknown(true).default).default([]),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -36,7 +37,7 @@ const createWorkspace = async (data) => {
     const newWorkspaceToAdd = {
       ...validDate,
       ownerId: new ObjectId(validDate.ownerId),
-      members: [
+      managers: [
         {
           _id: user._id,
           email: user.email,
@@ -139,10 +140,17 @@ const getWorkspacesIncludeMemberId = async (memberId) => {
             foreignField: 'workspaceId',
             as: 'boards'
           }
+        },
+        {
+          $lookup: {
+            from: memberModel.MEMBER_COLLECTION_NAME,
+            localField: '_id',
+            foreignField: 'workspaceId',
+            as: 'members'
+          }
         }
       ])
       .toArray()
-    console.log(result)
     return result
   } catch (error) {
     throw new Error(error)
@@ -217,12 +225,13 @@ const findManagerById = async (userId, workspaceId) => {
       .findOne({
         _id: new ObjectId(workspaceId)
       })
-
-    const isIncludeManager = result?.managers.find((id) => {
-      if (id.toString() === userId) {
-        return true
-      } else return false
-    })
+    const isIncludeManager =
+      result.managers ??
+      [].find((id) => {
+        if (id.toString() === userId) {
+          return true
+        } else return false
+      })
     return isIncludeManager ? true : false
   } catch (error) {
     throw new Error(error)

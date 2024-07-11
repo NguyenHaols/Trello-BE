@@ -1,10 +1,13 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
+import { memberModel } from '~/models/memberModel'
 import { userModel } from '~/models/userModel'
 import { workspaceModel } from '~/models/workspaceModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatter'
+import { memberService } from './membersService'
+import { userService } from './userService'
 
 const addMember = async (reqBody) => {
   try {
@@ -57,6 +60,8 @@ const createWorkspace = async (reqbody) => {
     const getNewWorkspace = await workspaceModel.findOneById(
       createdWorkspace.insertedId
     )
+    const user = await userService.findOneById(reqbody.ownerId)
+    await memberService.addMember(getNewWorkspace._id.toString(), user.email)
     return getNewWorkspace
   } catch (error) {
     throw error

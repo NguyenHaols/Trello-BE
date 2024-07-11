@@ -6,6 +6,7 @@ import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { workspaceModel } from '~/models/workspaceModel'
+import { memberModel } from '~/models/memberModel'
 
 const createNew = async (reqbody) => {
   try {
@@ -111,9 +112,7 @@ const findUserDetailById = async (id) => {
     if (!user) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id user not found')
     } else {
-      const workspaces = await workspaceModel.getWorkspacesIncludeMemberId(
-        user._id
-      )
+      const workspaces = await memberModel.getWorkspacesByMemberId(user._id)
       const cloneWorkspaces = cloneDeep(workspaces)
       userClone.workspaces = cloneWorkspaces
     }

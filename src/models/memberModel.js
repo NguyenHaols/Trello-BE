@@ -5,6 +5,8 @@ import { GET_DB } from '~/config/mongodb'
 import { boardModel } from './boardModel'
 import { userModel } from './userModel'
 import { userService } from '~/services/userService'
+import { workspaceModel } from './workspaceModel'
+import { result } from 'lodash'
 
 const MEMBER_COLLECTION_NAME = 'members'
 const MEMBER_COLLECTION_SCHEMA = Joi.object({
@@ -28,6 +30,40 @@ const validateBeforeCreate = async (data) => {
   })
 }
 
+const getMembersByWorkspaceId = async (workspaceId) => {
+  try {
+    const members = await GET_DB().collection(MEMBER_COLLECTION_NAME).aggregate([
+      { $match: { workspaceId: new ObjectId(workspaceId) } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userDetails'
+        }
+      },
+      { $unwind: '$userDetails' },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ['$$ROOT', '$userDetails']
+          }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0, // Loại bỏ trường userDetails vì nó đã được hợp nhất vào đối tượng gốc
+          password: 0 // Loại bỏ password
+        }
+      }
+    ]).toArray()
+
+    return members
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 const createNew = async (data) => {
   try {
     const validate = await validateBeforeCreate(data)
@@ -45,13 +81,13 @@ const createNew = async (data) => {
   }
 }
 
-const deleteMember = async (workspaceId, userId) => {
+const deleteMember = async (workspaceId, email) => {
   try {
     const result = await GET_DB()
       .collection(MEMBER_COLLECTION_NAME)
       .deleteOne({
         workspaceId: new ObjectId(workspaceId),
-        userId: new ObjectId(userId)
+        email: email
       })
     return result
   } catch (error) {
@@ -59,13 +95,13 @@ const deleteMember = async (workspaceId, userId) => {
   }
 }
 
-const checkMemberExist = async (workspaceId, userId) => {
+const checkMemberExist = async (workspaceId, email) => {
   try {
     const result = await GET_DB()
       .collection(MEMBER_COLLECTION_NAME)
       .findOne({
         workspaceId: new ObjectId(workspaceId),
-        userId: new ObjectId(userId)
+        email: email
       })
     if (result) {
       return true
@@ -77,8 +113,52 @@ const checkMemberExist = async (workspaceId, userId) => {
   }
 }
 
+const getWorkspacesByMemberId = async (memberId) => {
+  try {
+    const result = await GET_DB()
+      .collection(MEMBER_COLLECTION_NAME)
+      .aggregate([
+        {
+          $match: {
+            userId: new ObjectId(memberId)
+          }
+        },
+        {
+          $lookup: {
+            from: workspaceModel.WORKSPACE_COLLECTION_NAME,
+            localField: 'workspaceId',
+            foreignField: '_id',
+            as: 'workspaces'
+          }
+        },
+        {
+          $unwind: '$workspaces'
+        },
+        {
+          $replaceRoot: { newRoot: '$workspaces' }
+        },
+        {
+          $lookup: {
+            from: boardModel.BOARD_COLLECTION_NAME,
+            localField: '_id',
+            foreignField: 'workspaceId',
+            as: 'boards'
+          }
+        }
+      ])
+      .toArray()
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const memberModel = {
   checkMemberExist,
   createNew,
-  deleteMember
+  deleteMember,
+  getWorkspacesByMemberId,
+  getMembersByWorkspaceId,
+  MEMBER_COLLECTION_NAME
 }
