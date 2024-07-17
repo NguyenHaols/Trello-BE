@@ -11,7 +11,7 @@ export const generateAccessToken = (user, body) => {
       roleId: user.roleId,
       body: body
     },
-    env.JWT_ACCESS_KEY,
+    process.env.JWT_ACCESS_KEY,
     { expiresIn: '7d' }
   )
 }
@@ -22,7 +22,7 @@ export const generateRefreshToken = (user) => {
       id: user._id,
       roleId: user.roleId
     },
-    env.JWT_REFESH_KEY,
+    process.env.JWT_ACCESS_KEY,
     { expiresIn: '365d' }
   )
 }
