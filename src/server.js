@@ -29,14 +29,26 @@ const START_SERVER = () => {
     res.end('<h1>Hello World!</h1><hr>')
   })
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(`I am ${env.AUTHOR} running at ${ env.APP_HOST }:${ env.APP_PORT }`)
-
-    exitHook(() => {
-      console.log('App closed')
-      CLOSE_DB()
+  if (env.BUILD_MODE === 'production') {
+    app.listen(process.env.PORT, () => {
+      console.log(`I am ${env.AUTHOR} running at :${ process.env.PORT } in production`)
+  
+      exitHook(() => {
+        console.log('App closed')
+        CLOSE_DB()
+      })
     })
-  })
+  } else {
+    app.listen(env.APP_PORT, env.APP_HOST, () => {
+      console.log(`I am ${env.AUTHOR} running at ${ env.APP_HOST }:${ env.APP_PORT }`)
+  
+      exitHook(() => {
+        console.log('App closed')
+        CLOSE_DB()
+      })
+    })
+  }
+  
 }
 
 (async () => {

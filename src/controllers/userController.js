@@ -94,7 +94,7 @@ const getUser = async (req, res, next) => {
       return res.status(StatusCodes.OK).json(user)
     }
   } catch (error) {
-    return res.status(StatusCodes.NOT_FOUND).json('user is not exist')
+    next()
   }
 }
 
