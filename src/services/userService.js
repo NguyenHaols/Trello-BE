@@ -175,7 +175,10 @@ const checkLogin = async (reqBody) => {
       ? resUser
       : { succes: false, message: 'Wrong password' }
   } catch (error) {
-    throw error
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      error
+    )
   }
 }
 
