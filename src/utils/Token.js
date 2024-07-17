@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 export const generateAccessToken = (user, body) => {
   return jwt.sign(
