@@ -21,7 +21,6 @@ const START_SERVER = () => {
 
   app.use('/v1', APIs_V1)
 
-  
 
   // Middleware
   app.use(errorHandlingMiddleware)

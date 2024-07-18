@@ -43,12 +43,16 @@ const login = async (req, res, next) => {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: false,
         path: '/',
-        sameSite: 'None'
+        secure: false,
+        sameSite: 'None',
+        maxAge: 7 * 24 * 60 * 60 * 1000
       })
       res.cookie('accessToken', accessToken, {
         httpOnly: false,
         path: '/',
-        sameSite: 'None'
+        secure: false,
+        sameSite: 'None',
+        maxAge: 7 * 24 * 60 * 60 * 1000
       })
     }
 
