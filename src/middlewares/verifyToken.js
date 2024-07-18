@@ -8,7 +8,7 @@ import { workspaceService } from '~/services/workspaceService'
 export const verifyTokenUser = (req, res, next) => {
   const token = req.cookies.accessToken
   if (token) {
-    jwt.verify(token, env.JWT_ACCESS_KEY, (err, user) => {
+    jwt.verify(token, process.env.JWT_ACCESS_KEY, (err, user) => {
       if (err) {
         res
           .status(StatusCodes.FORBIDDEN)
