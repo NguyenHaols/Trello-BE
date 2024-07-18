@@ -41,12 +41,12 @@ const login = async (req, res, next) => {
       accessToken = generateAccessToken(user, req.body)
       refreshToken = generateRefreshToken(user)
       res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
+        httpOnly: false,
         path: '/',
         sameSite: 'None'
       })
       res.cookie('accessToken', accessToken, {
-        httpOnly: true,
+        httpOnly: false,
         path: '/',
         sameSite: 'None'
       })
