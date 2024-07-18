@@ -7,7 +7,7 @@ import { workspaceService } from '~/services/workspaceService'
 
 export const verifyTokenUser = (req, res, next) => {
   const token = req.cookies.accessToken
-  console.log(token)
+  console.log(req.cookies)
   if (token) {
     jwt.verify(token, process.env.JWT_ACCESS_KEY, (err, user) => {
       if (err) {
