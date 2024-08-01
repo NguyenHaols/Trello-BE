@@ -34,4 +34,6 @@ Router.route('/addStarred').post(userController.addStarredBoard)
 
 Router.route('/removeStarred').post(userController.removeStarredBoard)
 
+Router.route('/recoverPassword').post(userController.recoverPassword)
+
 export const userRoute = Router

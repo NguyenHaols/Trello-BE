@@ -3,6 +3,8 @@ import { userService } from '~/services/userService'
 import { generateAccessToken, generateRefreshToken } from '~/utils/Token'
 import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
+import { userModel } from '~/models/userModel'
+import bcrypt from 'bcrypt'
 
 const getAll = async (req, res, next) => {
   try {
@@ -27,6 +29,28 @@ const findOneByEmail = async (req, res, next) => {
     const user = await userService.findOneByEmail(req.body.email)
 
     res.status(StatusCodes.OK).json(user)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const recoverPassword = async(req, res, next) => {
+  try {
+    const token = req.body.token
+    const newPassword = req.body.newPassword
+    jwt.verify(token, process.env.JWT_ACCESS_KEY, async (err, user) => {
+      if (err) {
+        console.log(err)
+      } else {
+
+        const salt = await bcrypt.genSalt(10)
+        const hashed = await bcrypt.hash(newPassword, salt)
+        const password = hashed
+        const findUser = await userService.findOneById(user.id)
+        const result = await userModel.updatePassword(findUser.email, password)
+        res.status(StatusCodes.OK).json({success:true, message:'Update password successully'})
+      }
+    })
   } catch (error) {
     next(error)
   }
@@ -169,5 +193,6 @@ export const userController = {
   updateUser,
   updatePassword,
   addStarredBoard,
-  removeStarredBoard
+  removeStarredBoard,
+  recoverPassword
 }

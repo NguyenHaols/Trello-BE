@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
@@ -29,6 +29,37 @@ const createNew = async (data) => {
   }
 }
 
+const deleteById = async(id) => {
+  try {
+    const result = await GET_DB().collection(COMMENT_COLLECTION_NAME).deleteOne({
+      _id: new ObjectId(id)
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const updateContentById = async(id, newContent) => {
+  try {
+    const result = await GET_DB().collection(COMMENT_COLLECTION_NAME).findOneAndUpdate
+    (
+      {
+        _id: new ObjectId(id)
+      },
+      {
+        $set: { content: newContent, updatedAt: Date.now() }
+      },
+      {
+        returnDocument : 'after'
+      }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const findOneById = async(id) => {
   try {
     const result = await GET_DB().collection(COMMENT_COLLECTION_NAME).findOne({
@@ -53,5 +84,7 @@ export const commentModel = {
   createNew,
   findOneById,
   getAll,
+  deleteById,
+  updateContentById,
   COMMENT_COLLECTION_NAME
 }

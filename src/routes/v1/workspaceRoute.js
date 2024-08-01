@@ -1,6 +1,6 @@
 import express from 'express'
 import { workspaceController } from '~/controllers/workspaceController'
-import { verifyTokenAdmin, verifyTokenManager } from '~/middlewares/verifyToken'
+import { verifyTokenAdmin, verifyTokenManager, verifyTokenUser } from '~/middlewares/verifyToken'
 import { workspaceValidation } from '~/validations/workspaceValidation'
 
 const Router = express.Router()
@@ -18,7 +18,7 @@ Router.route('/createWorkspace').post(
 )
 
 Router.route('/update').post(
-  verifyTokenManager,
+  verifyTokenUser,
   workspaceValidation.update,
   workspaceController.update
 )

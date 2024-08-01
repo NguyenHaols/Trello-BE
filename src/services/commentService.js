@@ -21,6 +21,24 @@ const createNew = async (reqbody) => {
 
 }
 
+const deleteById = async(id) => {
+  try {
+    const result = await commentModel.deleteById(id)
+    return result.acknowledged && result.deletedCount > 0 ? true : false
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateContentById = async(id, newContent) => {
+  try {
+    const result = await commentModel.updateContentById(id, newContent)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 const getAll = async () => {
   try {
     const comments = await commentModel.getAll()
@@ -36,5 +54,7 @@ const getAll = async () => {
 
 export const commentService = {
   createNew,
-  getAll
+  getAll,
+  deleteById,
+  updateContentById
 }

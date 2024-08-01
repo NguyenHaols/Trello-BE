@@ -10,7 +10,7 @@ const createNew = async(req, res, next) => {
     ownerId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     title: Joi.string().required().min(3).max(50).trim().strict(),
     description: Joi.string().required().min(3).max(256).trim().strict(),
-    avatar:Joi.string().default('').optional(),
+    // avatar:Joi.string().default('').optional(),
     type: Joi.string().valid('Public', 'Private').required(),
   })
 
@@ -28,7 +28,7 @@ const update = async(req, res, next) => {
   // Không dùng required khi update
   const correctCondition = Joi.object({
     title: Joi.string().min(3).max(50).trim().strict(),
-    description: Joi.string().min(3).max(256).trim().strict(),
+    description: Joi.string().min(3).max(300).trim().strict(),
     type: Joi.string().valid('Public', 'Private')
   })
 
