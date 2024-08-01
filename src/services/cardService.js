@@ -121,6 +121,15 @@ const addTask= async(reqbody) => {
   }
 }
 
+const removeTask= async(cardId, taskName) => {
+  try {
+    const result = await cardModel.removeTaskByName(cardId, taskName)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 export const cardService = {
   createNew,
   getDetail,
@@ -128,5 +137,6 @@ export const cardService = {
   updateCard,
   deleteCard,
   updateTask,
-  addTask
+  addTask,
+  removeTask
 }

@@ -119,7 +119,6 @@ const createNew = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
 
-    // Sau khi validate thi id van la string nen can bien doi lai du lieu sang objectId
     const newCardToAdd = {
       ...validData,
       boardId: new ObjectId(validData.boardId),
@@ -176,6 +175,21 @@ const addTask = async (cardId, newTask) => {
   }
 }
 
+const removeTaskByName = async (cardId, taskName) => {
+  try {
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(cardId) },
+        { $pull: { tasks: { taskName: taskName } } },
+        { returnDocument: 'after' }
+      )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const updateTask = async (cardId, taskName, taskStatus) => {
   try {
     const card = await findOneById(cardId)
@@ -220,5 +234,6 @@ export const cardModel = {
   deleteOneById,
   updateTask,
   addTask,
-  deleteManyByBoardId
+  deleteManyByBoardId,
+  removeTaskByName
 }

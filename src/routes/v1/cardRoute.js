@@ -28,5 +28,8 @@ Router.route('/updateTask')
 Router.route('/addTask')
   .post(cardController.addTask)
 
+  Router.route('/removeTask')
+  .post(cardController.removeTask)
+
 
 export const cardRoute = Router

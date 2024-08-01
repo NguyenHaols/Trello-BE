@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import { cardService } from '~/services/cardService'
+import { response } from '~/utils/response'
 
 const createNew = async(req, res, next) => {
   try {
@@ -66,6 +67,21 @@ const addTask = async(req, res, next) => {
   }
 }
 
+const removeTask = async(req, res, next) => {
+  try {
+    const cardId = req.body.cardId
+    const taskName = req.body.taskName
+    const result = await cardService.removeTask(cardId, taskName)
+    if (result) {
+      return res.status(StatusCodes.OK).json(response(true, 'Remove task successfully', result))
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json(response(false, 'Remove task failure'))
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
 const deleteCard = async(req, res, next) => {
   try {
     const result = await cardService.deleteCard(req.body)
@@ -85,5 +101,6 @@ export const cardController= {
   update,
   deleteCard,
   updateTask,
-  addTask
+  addTask,
+  removeTask
 }
