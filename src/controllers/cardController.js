@@ -28,6 +28,20 @@ const addMember = async(req, res, next) => {
 
 }
 
+const removeMember = async(req, res, next) => {
+  try {
+    const {cardId,userId} = req.body
+    const result = await cardService.removeMember(cardId,userId)
+    if (result) {
+      return res.status(StatusCodes.OK).json(response(true,'Remove user success'))
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json(response(false,'Remove member Failure'))
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
 const update = async(req, res, next) => {
   try {
     const result = await cardService.updateCard(req.body)
@@ -102,5 +116,6 @@ export const cardController= {
   deleteCard,
   updateTask,
   addTask,
-  removeTask
+  removeTask,
+  removeMember
 }

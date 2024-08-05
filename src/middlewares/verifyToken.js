@@ -4,11 +4,8 @@ import jwt from 'jsonwebtoken'
 import { workspaceService } from '~/services/workspaceService'
 
 export const verifyTokenUser = (req, res, next) => {
-  const authHeader = req.headers.authorization
-  const secondToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
-  const token = req.cookies.accessToken
-  // console.log(req.cookies)
-  if (token || secondToken) {
+  const token = req.cookies.accessToken || (req.headers.authorization && req.headers.authorization.startsWith('Bearer ') ? req.headers.authorization.slice(7) : null);
+  if (token) {
     jwt.verify(token, process.env.JWT_ACCESS_KEY, (err, user) => {
       if (err) {
         res
