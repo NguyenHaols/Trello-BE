@@ -9,6 +9,8 @@ import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
 import cookieParser from 'cookie-parser'
+import passport from 'passport'
+import './passport'
 
 const START_SERVER = () => {
   const app = express()
@@ -21,7 +23,9 @@ const START_SERVER = () => {
 
   app.use('/v1', APIs_V1)
 
+  app.use(passport.initialize())
 
+  
   // Middleware
   app.use(errorHandlingMiddleware)
 

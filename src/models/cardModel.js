@@ -115,6 +115,26 @@ const addMember = async (cardId, user) => {
   }
 }
 
+const removeMember = async (cardId, userId) => {
+  try {
+    const card = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .updateOne(
+        {
+          _id: new ObjectId(cardId)
+        },
+        {
+          $pull: {
+            members: {_id : new ObjectId(userId)}
+          }
+        }
+      )
+    return card
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const createNew = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
@@ -235,5 +255,6 @@ export const cardModel = {
   updateTask,
   addTask,
   deleteManyByBoardId,
-  removeTaskByName
+  removeTaskByName,
+  removeMember
 }

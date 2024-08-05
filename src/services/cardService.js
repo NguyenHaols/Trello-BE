@@ -85,6 +85,19 @@ const addMember = async(reqBody) => {
   }
 }
 
+const removeMember = async(cardId,userId) => {
+  try {
+
+    const card = await cardModel.removeMember(cardId,userId)
+    if (!card) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'workspace not found')
+    }
+    return (card.acknowledged && card.modifiedCount) > 0 ? true : false
+  } catch (error) {
+    throw error
+  }
+}
+
 const deleteCard = async(reqbody) => {
   try {
     const result = await cardModel.deleteOneById(reqbody._id)
@@ -138,5 +151,6 @@ export const cardService = {
   deleteCard,
   updateTask,
   addTask,
-  removeTask
+  removeTask,
+  removeMember
 }

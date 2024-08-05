@@ -16,6 +16,9 @@ Router.route('/')
 Router.route('/addMember')
   .post(cardController.addMember)
 
+  Router.route('/removeMember')
+  .post(cardController.removeMember)
+
 Router.route('/update')
   .post(cardController.update)
 
