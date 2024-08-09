@@ -70,6 +70,7 @@ const findByReceiverId = async (id) => {
             _id: 1,
             senderId: 1,
             receiverId: 1,
+            workspaceId: 1,
             content: 1,
             createdAt: 1,
             'senderInfo.username': 1,
