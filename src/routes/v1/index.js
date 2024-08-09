@@ -11,6 +11,7 @@ import { codeRecoverRoute } from './codeRecoverRoute'
 import { roleRoute } from './roleRoute'
 import { memberRoute } from './memberRoute'
 import { auth20 } from './authRoute'
+import { notificationsRoute } from './notificationRoute'
 
 
 const Router = express.Router()
@@ -38,5 +39,7 @@ Router.use('/roles', roleRoute)
 Router.use('/workspace/member', memberRoute)
 
 Router.use('/auth', auth20)
+
+Router.use('/notifications', notificationsRoute)
 
 export const APIs_V1 = Router

@@ -11,6 +11,12 @@ import { corsOptions } from './config/cors'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
 import './passport'
+import http from 'http'
+import { Server } from 'socket.io'
+import { workspaceService } from './services/workspaceService'
+import { workspaceModel } from './models/workspaceModel'
+import { userService } from './services/userService'
+import { notificationsService } from './services/notificationsService'
 
 const START_SERVER = () => {
   const app = express()
@@ -25,7 +31,74 @@ const START_SERVER = () => {
 
   app.use(passport.initialize())
 
-  
+  const server = http.createServer(app)
+  const io = new Server(server, {
+    cors: {
+      origin:'http://localhost:5173',
+      methods:['GET', 'POST'],
+      credentials: true
+    }
+  })
+
+  let onlineUsers = []
+  const addOnlineUser = (email, socketId) => {
+    !onlineUsers.some(user => (user.email === email)) && onlineUsers.push({email,socketId})
+  }
+  const removeOnlineUser = (socketId) => {
+    onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
+  }
+  const getUserOnline = (email) => {
+    return onlineUsers.find(user => user.email === email)
+  }
+
+  io.on('connection', (socket) => {
+    socket.on('newUser', (userId) => {
+      addOnlineUser(userId, socket.id)
+      console.log(onlineUsers)
+    })
+
+    socket.on('invite', async(data) => {
+      // console.log(data)
+      const userReceiver = await userService.findOneByEmail(data.emailInvite)
+      const workspace = await workspaceModel.findOneById(data.workspaceId)
+      const invitedEmail = getUserOnline(data.emailInvite)
+      const message = `You have been added to workspace ${workspace ? workspace.title : ''}`
+      const newNotification = {
+        senderId : data.inviterId,
+        receiverId : userReceiver._id.toString(),
+        content : message,
+        workspaceId : data.workspaceId
+      }
+      const notification =  await notificationsService.createNew(newNotification)
+      // console.log(invitedEmail)
+      // console.log(invitedEmail.socketId, 'Đã gửi đi emit invited-Noti')
+      socket.to(invitedEmail?.socketId).emit('invited-Notification', {message})
+    })
+
+    socket.on('removeMember', async(data) => {
+      const member = getUserOnline(data.emailRemove)
+      const workspace = await workspaceModel.findOneById(data.workspaceId)
+      const userReceiver = await userService.findOneByEmail(data.emailRemove)
+      const message = `You have been remove from workspace ${workspace ? workspace.title : ''}`
+      const newNotification = {
+        senderId : data.senderId,
+        receiverId : userReceiver._id.toString(),
+        content : message,
+        workspaceId : data.workspaceId
+      }
+      const notification =  await notificationsService.createNew(newNotification)
+      if (member) {
+        socket.to(member.socketId).emit('remove-Nofication', {
+          message
+        })
+      }
+    })
+
+    socket.on('disconnect', () => {
+      removeOnlineUser(socket.id)
+      // console.log(onlineUsers)
+    })
+  })
   // Middleware
   app.use(errorHandlingMiddleware)
 
@@ -43,7 +116,7 @@ const START_SERVER = () => {
       })
     })
   } else {
-    app.listen(env.APP_PORT, env.APP_HOST, () => {
+    server.listen(env.APP_PORT, env.APP_HOST, () => {
       console.log(`I am ${env.AUTHOR} running at ${ env.APP_HOST }:${ env.APP_PORT }`)
 
       exitHook(() => {
