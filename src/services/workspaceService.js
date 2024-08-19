@@ -106,9 +106,6 @@ const deleteOneById = async (reqbody) => {
       }
 
     }
-    if (!result) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Workspace not found')
-    }
     return result
   } catch (error) {
     throw error

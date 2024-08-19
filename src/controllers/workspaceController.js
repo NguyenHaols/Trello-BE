@@ -56,7 +56,7 @@ const update = async (req, res, next) => {
 const deleteWorkspace = async (req, res, next) => {
   try {
     const result = await workspaceService.deleteOneById(req.body)
-    if (result) {
+    if (result.acknowledged && result.deletedCount > 0) {
       return res.status(StatusCodes.OK).json({ message: 'Delete successfully' })
     } else {
       return res
