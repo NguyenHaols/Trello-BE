@@ -94,6 +94,12 @@ const START_SERVER = () => {
       }
     })
 
+    // socket.on('roomChat', async(data) => {
+    //   const {senderId, receiverId} = data
+    //   const roomId = 
+
+    // })
+
     socket.on('disconnect', () => {
       removeOnlineUser(socket.id)
       // console.log(onlineUsers)

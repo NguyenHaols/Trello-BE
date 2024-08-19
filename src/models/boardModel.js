@@ -50,6 +50,20 @@ const findOneById = async (id) => {
   }
 }
 
+const findBoardsByWorkspaceId = async (id) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .find({
+        workspaceId: new ObjectId(id)
+      })
+      .toArray()
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const getDetail = async (boardId) => {
   try {
     const result = await GET_DB()
@@ -177,6 +191,19 @@ const deleteOneById = async (id) => {
   }
 }
 
+const deleteManyByWorkspaceId= async (id) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .deleteMany({
+        workspaceId: new ObjectId(id)
+      })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -186,5 +213,7 @@ export const boardModel = {
   pushColumnOrderIds,
   pullColumnOrderIds,
   update,
-  deleteOneById
+  deleteOneById,
+  deleteManyByWorkspaceId,
+  findBoardsByWorkspaceId
 }

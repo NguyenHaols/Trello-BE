@@ -4,10 +4,9 @@ import { verifyTokenManager, verifyTokenUser } from '~/middlewares/verifyToken'
 
 const Router = express.Router()
 
-Router.route('/addMember').post(verifyTokenManager, memberController.addNew)
+Router.route('/addMember').post(memberController.addNew)
 
 Router.route('/removeMember').post(
-  verifyTokenManager,
   memberController.removeMember
 )
 

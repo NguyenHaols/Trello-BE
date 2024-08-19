@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash'
 import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
 import { commentService } from './commentService'
+import { workspaceModel } from '~/models/workspaceModel'
 
 const createNew = async (reqbody) => {
   try {

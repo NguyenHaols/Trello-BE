@@ -8,6 +8,9 @@ import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatter'
 import { memberService } from './membersService'
 import { userService } from './userService'
+import { boardModel } from '~/models/boardModel'
+import { columnModel } from '~/models/columnModel'
+import { cardModel } from '~/models/cardModel'
 
 const addMember = async (reqBody) => {
   try {
@@ -88,8 +91,23 @@ const update = async (reqbody) => {
 const deleteOneById = async (reqbody) => {
   try {
     const result = await workspaceModel.deleteOneById(reqbody._id)
+    console.log('🚀 ~ deleteOneById ~ result:', result)
+    if (result.acknowledged && result.deletedCount > 0) {
+      // tim cac board chua workspaceId
+      const boards = await boardModel.findBoardsByWorkspaceId(reqbody._id)
+
+      // xoa cac board do
+      await boardModel.deleteManyByWorkspaceId(reqbody._id)
+
+      // xoa cac column và card
+      for (const board of boards) {
+        await columnModel.deleteManyByBoardId(board._id)
+        await cardModel.deleteManyByBoardId(board._id)
+      }
+
+    }
     if (!result) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Card not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Workspace not found')
     }
     return result
   } catch (error) {
