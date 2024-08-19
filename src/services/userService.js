@@ -15,7 +15,8 @@ const createNew = async (reqbody) => {
     const newUser = {
       ...reqbody,
       password: hashed,
-      slug: slugify(reqbody.username)
+      slug: slugify(reqbody.username),
+      avatar: 'https://res.cloudinary.com/dzltzzi3h/image/upload/v1722532704/lcja7hpm3yfyhfahmiy8.png'
     }
 
     const createdUser = await userModel.createNew(newUser)
