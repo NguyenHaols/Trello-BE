@@ -10,12 +10,13 @@ const addMember = async (workspaceId, email) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User already exist')
     }
     const user = await userService.findOneByEmail(email)
+    if (!user) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not exist')
+    }
     const member = {
       workspaceId,
+      email: email,
       userId: user._id.toString(),
-      email: user.email,
-      username: user.username,
-      avatar: user.avatar
     }
     const result = await memberModel.createNew(member)
     return result.acknowledged == true

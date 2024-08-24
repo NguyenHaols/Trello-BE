@@ -6,9 +6,7 @@ const Router = express.Router()
 
 Router.route('/addMember').post(memberController.addNew)
 
-Router.route('/removeMember').post(
-  memberController.removeMember
-)
+Router.route('/removeMember').post(memberController.removeMember)
 
 Router.route('/getMembersByWorkspaceId/:id').get(verifyTokenUser, memberController.getMembersByWorkspaceId)
 

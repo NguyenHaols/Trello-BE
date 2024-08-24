@@ -18,9 +18,7 @@ const MEMBER_COLLECTION_SCHEMA = Joi.object({
     .required()
     .pattern(OBJECT_ID_RULE)
     .message(OBJECT_ID_RULE_MESSAGE),
-  username: Joi.string().required().min(3).max(50).trim().strict(),
   email: Joi.string().required().min(10).max(50).trim().strict(),
-  avatar: Joi.string().default('').optional(),
   addedAt: Joi.date().timestamp('javascript').default(Date.now)
 })
 
