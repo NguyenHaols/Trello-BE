@@ -19,7 +19,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   members: Joi.array().items(Joi.object().unknown(true).default).default([]),
   tasks: Joi.array().items(Joi.object().unknown(true).default).default([]),
   comments: Joi.array().items(Joi.object().unknown(true).default).default([]),
-  deadline: Joi.date().timestamp('javascript').default(Date.now),
+  deadline: Joi.date().timestamp('javascript').default(() => new Date(Date.now() + 24 * 60 * 60 * 1000)),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
@@ -182,6 +182,9 @@ const update = async (cardId, updateData) => {
 
 const addTask = async (cardId, newTask) => {
   try {
+    if (!newTask._id) {
+      newTask._id = new ObjectId()
+    }
     const result = await GET_DB()
       .collection(CARD_COLLECTION_NAME)
       .findOneAndUpdate(
@@ -195,13 +198,13 @@ const addTask = async (cardId, newTask) => {
   }
 }
 
-const removeTaskByName = async (cardId, taskName) => {
+const removeTaskById = async (cardId, taskId) => {
   try {
     const result = await GET_DB()
       .collection(CARD_COLLECTION_NAME)
       .findOneAndUpdate(
         { _id: new ObjectId(cardId) },
-        { $pull: { tasks: { taskName: taskName } } },
+        { $pull: { tasks: { _id: new ObjectId(taskId) } } },
         { returnDocument: 'after' }
       )
     return result
@@ -210,13 +213,36 @@ const removeTaskByName = async (cardId, taskName) => {
   }
 }
 
-const updateTask = async (cardId, taskName, taskStatus) => {
+const updateTaskAssign = async (cardId, taskId, taskStatus, userId) => {
+  // console.log('🚀 ~ updateTaskAssign ~ taskId:', taskId)
+  // console.log('🚀 ~ updateTaskAssign ~ userId:', userId)
   try {
     const card = await findOneById(cardId)
     if (!card) {
       throw new Error('CardId not found')
     }
-    const index = card.tasks.findIndex((task) => task.taskName === taskName)
+    const index = card.tasks.findIndex((task) => task._id.equals(new ObjectId(taskId)))
+    if (index === -1) {
+      throw new Error('Task not found')
+    }
+    card.tasks[index].taskStatus = taskStatus
+    card.tasks[index].userId = userId
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .updateOne({ _id: new ObjectId(cardId) }, { $set: { tasks: card.tasks } })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const updateTask = async (cardId, taskId, taskStatus) => {
+  try {
+    const card = await findOneById(cardId)
+    if (!card) {
+      throw new Error('CardId not found')
+    }
+    const index = card.tasks.findIndex((task) => task._id.equals(new ObjectId(taskId)))
     if (index === -1) {
       throw new Error('Task not found')
     }
@@ -255,6 +281,7 @@ export const cardModel = {
   updateTask,
   addTask,
   deleteManyByBoardId,
-  removeTaskByName,
-  removeMember
+  removeTaskById,
+  removeMember,
+  updateTaskAssign
 }

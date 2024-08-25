@@ -9,7 +9,7 @@ import { userModel } from '~/models/userModel'
 const createNew = async (reqbody) => {
   try {
     const newCard = {
-      ...reqbody,
+      ...reqbody
     }
 
     const createdCard = await cardModel.createNew(newCard)
@@ -32,7 +32,7 @@ const updateCard = async(reqbody) => {
       ...reqbody
     }
     delete dataUpdate._id
-    const result = cardModel.update(reqbody._id,dataUpdate)
+    const result = cardModel.update(reqbody._id, dataUpdate)
     return result
   } catch (error) {
     throw error
@@ -85,10 +85,10 @@ const addMember = async(reqBody) => {
   }
 }
 
-const removeMember = async(cardId,userId) => {
+const removeMember = async(cardId, userId) => {
   try {
 
-    const card = await cardModel.removeMember(cardId,userId)
+    const card = await cardModel.removeMember(cardId, userId)
     if (!card) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'workspace not found')
     }
@@ -110,9 +110,22 @@ const deleteCard = async(reqbody) => {
   }
 }
 
+const updateTaskAssign = async(reqbody) => {
+  try {
+    const { cardId, taskId, taskStatus, userId } = reqbody
+    const result = await cardModel.updateTaskAssign(cardId, taskId, taskStatus, userId)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Update failure')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 const updateTask = async(reqbody) => {
   try {
-    const result = await cardModel.updateTask(reqbody.cardId,reqbody.taskName,reqbody.taskStatus)
+    const result = await cardModel.updateTask(reqbody.cardId, reqbody.taskId, reqbody.taskStatus)
     if (!result) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update failure')
     }
@@ -124,7 +137,7 @@ const updateTask = async(reqbody) => {
 
 const addTask= async(reqbody) => {
   try {
-    const result = await cardModel.addTask(reqbody.cardId,reqbody.newTask)
+    const result = await cardModel.addTask(reqbody.cardId, reqbody.newTask)
     if (!result) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Add task failure')
     }
@@ -134,9 +147,9 @@ const addTask= async(reqbody) => {
   }
 }
 
-const removeTask= async(cardId, taskName) => {
+const removeTask= async(cardId, taskId) => {
   try {
-    const result = await cardModel.removeTaskByName(cardId, taskName)
+    const result = await cardModel.removeTaskById(cardId, taskId)
     return result
   } catch (error) {
     throw error
@@ -152,5 +165,6 @@ export const cardService = {
   updateTask,
   addTask,
   removeTask,
-  removeMember
+  removeMember,
+  updateTaskAssign
 }

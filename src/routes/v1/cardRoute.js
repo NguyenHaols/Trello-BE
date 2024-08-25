@@ -28,6 +28,9 @@ Router.route('/delete')
 Router.route('/updateTask')
   .post(cardController.updateTask)
 
+  Router.route('/updateTaskAssign')
+  .post(cardController.updateTaskAssign)
+
 Router.route('/addTask')
   .post(cardController.addTask)
 

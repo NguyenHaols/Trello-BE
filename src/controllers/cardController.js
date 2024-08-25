@@ -68,6 +68,20 @@ const updateTask = async(req, res, next) => {
   }
 }
 
+const updateTaskAssign = async(req, res, next) => {
+  try {
+    const result = await cardService.updateTaskAssign(req.body)
+    if (result) {
+      return res.status(StatusCodes.OK).json({message:'Update successfully'})
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json({message:'Update Failure'})
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 const addTask = async(req, res, next) => {
   try {
     const result = await cardService.addTask(req.body)
@@ -84,8 +98,8 @@ const addTask = async(req, res, next) => {
 const removeTask = async(req, res, next) => {
   try {
     const cardId = req.body.cardId
-    const taskName = req.body.taskName
-    const result = await cardService.removeTask(cardId, taskName)
+    const taskId = req.body.taskId
+    const result = await cardService.removeTask(cardId, taskId)
     if (result) {
       return res.status(StatusCodes.OK).json(response(true, 'Remove task successfully', result))
     } else {
@@ -117,5 +131,6 @@ export const cardController= {
   updateTask,
   addTask,
   removeTask,
-  removeMember
+  removeMember,
+  updateTaskAssign
 }
