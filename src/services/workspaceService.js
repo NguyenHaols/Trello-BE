@@ -12,6 +12,20 @@ import { boardModel } from '~/models/boardModel'
 import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
 
+const findOneById = async (reqbody) => {
+  try {
+  const {workspaceId} = reqbody
+    const workspace = await workspaceModel.findOneById(workspaceId)
+    if (!workspace) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Workspace not found')
+    }
+    // const members = 
+    return workspace
+  } catch (error) {
+    throw new Error
+  }
+}
+
 const addMember = async (reqBody) => {
   try {
     const user = await userModel.findOneByEmail(reqBody.email)
@@ -136,5 +150,6 @@ export const workspaceService = {
   update,
   deleteOneById,
   getAll,
-  findManagerById
+  findManagerById,
+  findOneById
 }

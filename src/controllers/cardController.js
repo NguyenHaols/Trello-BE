@@ -81,6 +81,19 @@ const updateTaskAssign = async(req, res, next) => {
   }
 }
 
+const updateTaskTime = async(req, res, next) => {
+  try {
+    const result = await cardService.updateTaskTime(req.body)
+    if (result) {
+      return res.status(StatusCodes.OK).json({message:'Update successfully'})
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json({message:'Update Failure'})
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 const addTask = async(req, res, next) => {
   try {
@@ -132,5 +145,6 @@ export const cardController= {
   addTask,
   removeTask,
   removeMember,
-  updateTaskAssign
+  updateTaskAssign,
+  updateTaskTime
 }

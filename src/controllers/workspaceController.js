@@ -1,5 +1,16 @@
 import { StatusCodes } from 'http-status-codes'
 import { workspaceService } from '~/services/workspaceService'
+import { response } from '~/utils/response'
+
+
+const findOneById = async (req, res, next) => {
+  try {
+    const result = await workspaceService.findOneById(req.body)
+    return res.status(StatusCodes.OK).json(response(true,'success',result))
+  } catch (error) {
+    next(error)
+  }
+}
 
 const addMember = async (req, res, next) => {
   try {
@@ -95,5 +106,6 @@ export const workspaceController = {
   createWorkspace,
   update,
   deleteWorkspace,
-  getAll
+  getAll,
+  findOneById
 }

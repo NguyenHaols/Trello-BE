@@ -5,14 +5,20 @@ import { workspaceValidation } from '~/validations/workspaceValidation'
 
 const Router = express.Router()
 
+Router.route('/findById').post(
+  verifyTokenUser,
+  workspaceController.findOneById
+)
+
 Router.route('/addMember').post(
-  verifyTokenManager,
+  verifyTokenUser,
   workspaceController.addMember
 )
 
-Router.route('/removeMember').post(workspaceController.removeMember)
+Router.route('/removeMember').post(verifyTokenUser, workspaceController.removeMember)
 
 Router.route('/createWorkspace').post(
+  verifyTokenUser,
   workspaceValidation.createNew,
   workspaceController.createWorkspace
 )
@@ -23,7 +29,7 @@ Router.route('/update').post(
   workspaceController.update
 )
 
-Router.route('/delete').post(workspaceController.deleteWorkspace)
+Router.route('/delete').post(verifyTokenUser, workspaceController.deleteWorkspace)
 
 Router.route('/getAll').get(verifyTokenAdmin, workspaceController.getAll)
 

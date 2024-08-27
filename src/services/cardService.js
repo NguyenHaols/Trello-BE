@@ -123,6 +123,19 @@ const updateTaskAssign = async(reqbody) => {
   }
 }
 
+const updateTaskTime = async(reqbody) => {
+  try {
+    const { cardId, taskId, deadline } = reqbody
+    const result = await cardModel.updateTaskTime(cardId, taskId, deadline)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Update failure')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 const updateTask = async(reqbody) => {
   try {
     const result = await cardModel.updateTask(reqbody.cardId, reqbody.taskId, reqbody.taskStatus)
@@ -166,5 +179,6 @@ export const cardService = {
   addTask,
   removeTask,
   removeMember,
-  updateTaskAssign
+  updateTaskAssign,
+  updateTaskTime
 }

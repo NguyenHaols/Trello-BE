@@ -16,7 +16,7 @@ Router.route('/')
 Router.route('/addMember')
   .post(cardController.addMember)
 
-  Router.route('/removeMember')
+Router.route('/removeMember')
   .post(cardController.removeMember)
 
 Router.route('/update')
@@ -28,13 +28,16 @@ Router.route('/delete')
 Router.route('/updateTask')
   .post(cardController.updateTask)
 
-  Router.route('/updateTaskAssign')
+Router.route('/updateTaskAssign')
   .post(cardController.updateTaskAssign)
+
+Router.route('/updateTaskTime')
+  .post(cardController.updateTaskTime)
 
 Router.route('/addTask')
   .post(cardController.addTask)
 
-  Router.route('/removeTask')
+Router.route('/removeTask')
   .post(cardController.removeTask)
 
 

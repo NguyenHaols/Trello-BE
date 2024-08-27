@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import cloudinary from '~/config/cloudinaryConfig'
+import mime from 'mime-types'
 
 const upload = async(req, res, next) => {
   try {
@@ -34,7 +35,45 @@ const remove = async(req, res, next) => {
   }
 }
 
+const uploadFile = async(req, res, next) => {
+  try {
+    const file = req.file.path
+    const fileExtension = mime.extension(file.mimetype)
+    const result = await cloudinary.uploader.upload(file, { resource_type: 'auto' })
+    console.log('🚀 ~ uploadFile ~ result:', result)
+    const uploadedFile = {
+      url: result.secure_url,
+      publicId: `${result.public_id}.${fileExtension}`,
+      fileName: result.original_filename.replace(/\.[^/.]+$/, '')
+    }
+    return res.status(StatusCodes.OK).json({
+      message: 'Upload file successfully',
+      data: uploadedFile
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const removeFile = async(req, res, next) => {
+  try {
+    const publicId = req.params.id
+    const result = await cloudinary.uploader.destroy(publicId)
+    if (result.result === 'not found') {
+      throw new Error('Delete file failed')
+    }
+    res.status(StatusCodes.OK).json({
+      message: 'Delete file successfully',
+      data: result
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const ImagesController = {
   upload,
-  remove
+  remove,
+  uploadFile,
+  removeFile
 }

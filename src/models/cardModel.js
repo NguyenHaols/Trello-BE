@@ -18,6 +18,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   description: Joi.string().optional().default(''),
   members: Joi.array().items(Joi.object().unknown(true).default).default([]),
   tasks: Joi.array().items(Joi.object().unknown(true).default).default([]),
+  attachs: Joi.array().items(Joi.object().unknown(true).default).default([]),
   comments: Joi.array().items(Joi.object().unknown(true).default).default([]),
   deadline: Joi.date().timestamp('javascript').default(() => new Date(Date.now() + 24 * 60 * 60 * 1000)),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -198,6 +199,24 @@ const addTask = async (cardId, newTask) => {
   }
 }
 
+const addAttachment = async (cardId, newAttach) => {
+  try {
+    if (!newAttach._id) {
+      newAttach._id = new ObjectId()
+    }
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(cardId) },
+        { $push: { attachs: newAttach } },
+        { returnDocument: 'after' }
+      )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const removeTaskById = async (cardId, taskId) => {
   try {
     const result = await GET_DB()
@@ -214,8 +233,6 @@ const removeTaskById = async (cardId, taskId) => {
 }
 
 const updateTaskAssign = async (cardId, taskId, taskStatus, userId) => {
-  // console.log('🚀 ~ updateTaskAssign ~ taskId:', taskId)
-  // console.log('🚀 ~ updateTaskAssign ~ userId:', userId)
   try {
     const card = await findOneById(cardId)
     if (!card) {
@@ -227,6 +244,26 @@ const updateTaskAssign = async (cardId, taskId, taskStatus, userId) => {
     }
     card.tasks[index].taskStatus = taskStatus
     card.tasks[index].userId = userId
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .updateOne({ _id: new ObjectId(cardId) }, { $set: { tasks: card.tasks } })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const updateTaskTime = async (cardId, taskId, deadline) => {
+  try {
+    const card = await findOneById(cardId)
+    if (!card) {
+      throw new Error('CardId not found')
+    }
+    const index = card.tasks.findIndex((task) => task._id.equals(new ObjectId(taskId)))
+    if (index === -1) {
+      throw new Error('Task not found')
+    }
+    card.tasks[index].deadline = deadline
     const result = await GET_DB()
       .collection(CARD_COLLECTION_NAME)
       .updateOne({ _id: new ObjectId(cardId) }, { $set: { tasks: card.tasks } })
@@ -283,5 +320,6 @@ export const cardModel = {
   deleteManyByBoardId,
   removeTaskById,
   removeMember,
-  updateTaskAssign
+  updateTaskAssign,
+  updateTaskTime
 }
