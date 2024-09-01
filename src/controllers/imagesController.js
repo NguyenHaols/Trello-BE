@@ -38,13 +38,13 @@ const remove = async(req, res, next) => {
 const uploadFile = async(req, res, next) => {
   try {
     const file = req.file.path
-    const fileExtension = mime.extension(file.mimetype)
+    const fileExtension = mime.extension(req.file.mimetype)
     const result = await cloudinary.uploader.upload(file, { resource_type: 'auto' })
-    console.log('🚀 ~ uploadFile ~ result:', result)
     const uploadedFile = {
       url: result.secure_url,
       publicId: `${result.public_id}.${fileExtension}`,
-      fileName: result.original_filename.replace(/\.[^/.]+$/, '')
+      fileName: result.original_filename.replace(/\.[^/.]+$/, ''),
+      fileExtension
     }
     return res.status(StatusCodes.OK).json({
       message: 'Upload file successfully',

@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import ApiError from '~/utils/ApiError'
@@ -21,6 +21,7 @@ const NOTIFICATIONS_COLLECTION_SCHEMA = Joi.object({
     .message(OBJECT_ID_RULE_MESSAGE),
   content: Joi.string().required().min(3).max(250).trim().strict(),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  isRead: Joi.boolean().default(false),
   _destroy: Joi.boolean().default(false)
 })
 
@@ -37,7 +38,7 @@ const createNotifications = async (data) => {
       ...validDate,
       senderId: new ObjectId(validDate.senderId),
       receiverId: new ObjectId(validDate.receiverId),
-      workspaceId: new ObjectId(validDate.workspaceId)
+      workspaceId: new ObjectId(validDate.workspaceId),
     }
     const createdWorkspace = await GET_DB()
       .collection(NOTIFICATIONS_COLLECTION_NAME)
@@ -73,6 +74,7 @@ const findByReceiverId = async (id) => {
             workspaceId: 1,
             content: 1,
             createdAt: 1,
+            isRead: 1,
             'senderInfo.username': 1,
             'senderInfo.email': 1,
             'senderInfo.avatar': 1
@@ -101,9 +103,29 @@ const findOneById = async (id) => {
   }
 }
 
+const setIsRead = async(notiId) => {
+  try {
+    const result = await GET_DB().collection(NOTIFICATIONS_COLLECTION_NAME).findOneAndUpdate(
+      {
+        _id: new ObjectId(notiId)
+      },
+      {
+        $set: {isRead: true}
+      },
+      {
+        returnDocument: 'after'
+      }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 
 export const notificationsModel = {
   createNotifications,
   findByReceiverId,
-  findOneById
+  findOneById,
+  setIsRead
 }

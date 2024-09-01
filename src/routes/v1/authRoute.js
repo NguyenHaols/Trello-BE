@@ -13,9 +13,8 @@ Router.get('/google/callback', (req, res, next) => {
       return next(err)
     }
     if (!user) return res.redirect(`${process.env.URL_CLIENT}/auth/login`)
-    next()
     const { token } = user
-    res.redirect(`${process.env.URL_CLIENT}auth/login-success/${token}`)
+    return res.redirect(`${process.env.URL_CLIENT}auth/login-success/${token}`)
   })(req, res, next)
 })
 
@@ -28,9 +27,8 @@ Router.get('/facebook/callback', (req, res, next) => {
       return next(err)
     }
     if (!user) return res.redirect(`${process.env.URL_CLIENT}/auth/login`)
-    next()
     const { token } = user
-    res.redirect(`${process.env.URL_CLIENT}auth/login-success/${token}`)
+    return res.redirect(`${process.env.URL_CLIENT}auth/login-success/${token}`)
   })(req, res, next)
 })
 

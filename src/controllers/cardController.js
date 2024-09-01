@@ -108,6 +108,19 @@ const addTask = async(req, res, next) => {
   }
 }
 
+const addAttach = async(req, res, next) => {
+  try {
+    const result = await cardService.addAttach(req.body)
+    if (result) {
+      return res.status(StatusCodes.OK).json(result)
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json({message:'Add attach failure'})
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
 const removeTask = async(req, res, next) => {
   try {
     const cardId = req.body.cardId
@@ -117,6 +130,21 @@ const removeTask = async(req, res, next) => {
       return res.status(StatusCodes.OK).json(response(true, 'Remove task successfully', result))
     } else {
       return res.status(StatusCodes.NOT_FOUND).json(response(false, 'Remove task failure'))
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+const removeAttach= async(req, res, next) => {
+  try {
+    const cardId = req.body.cardId
+    const attachId = req.body.attachId
+    const result = await cardService.removeAttach(cardId, attachId)
+    if (result) {
+      return res.status(StatusCodes.OK).json(response(true, 'Remove attach successfully', result))
+    } else {
+      return res.status(StatusCodes.NOT_FOUND).json(response(false, 'Remove attach failure'))
     }
   } catch (error) {
     next(error)
@@ -146,5 +174,7 @@ export const cardController= {
   removeTask,
   removeMember,
   updateTaskAssign,
-  updateTaskTime
+  updateTaskTime,
+  addAttach,
+  removeAttach
 }

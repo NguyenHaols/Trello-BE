@@ -160,9 +160,39 @@ const addTask= async(reqbody) => {
   }
 }
 
+
 const removeTask= async(cardId, taskId) => {
   try {
     const result = await cardModel.removeTaskById(cardId, taskId)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+const addAttach = async(reqbody) => {
+  try {
+    const { cardId, filename, publicId, url, fileExtension } = reqbody
+    const newAttach = {
+      filename,
+      publicId,
+      url,
+      fileExtension,
+      addedAt: Date.now()
+    }
+    const result = await cardModel.addAttachment(cardId, newAttach)
+    if (!result) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Add attach failure')
+    }
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+const removeAttach= async(cardId, attachId) => {
+  try {
+    const result = await cardModel.removeAttachById(cardId, attachId)
     return result
   } catch (error) {
     throw error
@@ -180,5 +210,7 @@ export const cardService = {
   removeTask,
   removeMember,
   updateTaskAssign,
-  updateTaskTime
+  updateTaskTime,
+  addAttach,
+  removeAttach
 }

@@ -217,6 +217,22 @@ const addAttachment = async (cardId, newAttach) => {
   }
 }
 
+const removeAttachById = async (cardId, attachId) => {
+  try {
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(cardId) },
+        { $pull: { attachs: { _id: new ObjectId(attachId) } } },
+        { returnDocument: 'after' }
+      )
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const removeTaskById = async (cardId, taskId) => {
   try {
     const result = await GET_DB()
@@ -321,5 +337,7 @@ export const cardModel = {
   removeTaskById,
   removeMember,
   updateTaskAssign,
-  updateTaskTime
+  updateTaskTime,
+  addAttachment,
+  removeAttachById
 }

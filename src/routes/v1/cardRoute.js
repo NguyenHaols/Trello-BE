@@ -2,6 +2,7 @@ import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { cardValidation } from '~/validations/cardValidation'
 import { cardController } from '~/controllers/cardController'
+import { verifyTokenManager, verifyTokenUser } from '~/middlewares/verifyToken'
 
 
 const Router = express.Router()
@@ -14,31 +15,37 @@ Router.route('/')
   .post(cardValidation.createNew, cardController.createNew)
 
 Router.route('/addMember')
-  .post(cardController.addMember)
+  .post(verifyTokenUser, cardController.addMember)
 
 Router.route('/removeMember')
-  .post(cardController.removeMember)
+  .post(verifyTokenUser, cardController.removeMember)
 
 Router.route('/update')
-  .post(cardController.update)
+  .post(verifyTokenUser, cardController.update)
 
 Router.route('/delete')
-  .post(cardController.deleteCard)
+  .post(verifyTokenUser, cardController.deleteCard)
 
 Router.route('/updateTask')
-  .post(cardController.updateTask)
+  .post(verifyTokenUser, cardController.updateTask)
 
 Router.route('/updateTaskAssign')
-  .post(cardController.updateTaskAssign)
+  .post(verifyTokenUser, cardController.updateTaskAssign)
 
 Router.route('/updateTaskTime')
-  .post(cardController.updateTaskTime)
+  .post(verifyTokenUser, cardController.updateTaskTime)
 
 Router.route('/addTask')
-  .post(cardController.addTask)
+  .post(verifyTokenUser, cardController.addTask)
 
 Router.route('/removeTask')
-  .post(cardController.removeTask)
+  .post(verifyTokenUser, cardController.removeTask)
+
+Router.route('/addAttach')
+  .post(verifyTokenUser, cardController.addAttach)
+
+Router.route('/removeAttach')
+  .post(verifyTokenUser, cardController.removeAttach)
 
 
 export const cardRoute = Router

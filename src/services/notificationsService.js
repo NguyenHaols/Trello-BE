@@ -28,7 +28,17 @@ const findByReceiverId = async(reqbody) => {
   }
 }
 
+const setIsRead = async(id) => {
+  try {
+    const result = await notificationsModel.setIsRead(id)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
 export const notificationsService = {
   createNew,
-  findByReceiverId
+  findByReceiverId,
+  setIsRead
 }

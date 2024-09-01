@@ -23,7 +23,18 @@ const findByReceiverId = async(req, res, next) => {
   }
 }
 
+const setIsRead = async(req, res, next) => {
+  try {
+    const {_id} = req.body
+    const result = await notificationsService.setIsRead(_id)
+    return result ? res.status(StatusCodes.OK).json(response(true,'Update is read success', result)) : res.status(StatusCodes.BAD_REQUEST).json(response(false,'Update is read failure'))
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const notificationsController = {
   createNew,
-  findByReceiverId
+  findByReceiverId,
+  setIsRead
 }
