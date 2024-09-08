@@ -12,6 +12,8 @@ Router.route('/')
 
 Router.route('/login').post(userValidation.login, userController.login)
 
+Router.route('/loginAdmin').post(userValidation.login, userController.loginAdmin)
+
 Router.route('/logout').post(verifyTokenUser, userController.logOut)
 
 Router.route('/refreshToken').post(userController.requestRefreshToken)
@@ -35,5 +37,8 @@ Router.route('/addStarred').post(userController.addStarredBoard)
 Router.route('/removeStarred').post(userController.removeStarredBoard)
 
 Router.route('/recoverPassword').post(userController.recoverPassword)
+
+Router.route('/getPercentOnMonth').get(verifyTokenAdmin, userController.getGrowthPercentOnMonth)
+
 
 export const userRoute = Router

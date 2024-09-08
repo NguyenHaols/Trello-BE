@@ -4,6 +4,7 @@ import { GET_DB } from '~/config/mongodb'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import moment from 'moment'
 
 const COMMENT_COLLECTION_NAME = 'comments'
 const COMMENT_COLLECTION_SCHEMA = Joi.object({
@@ -80,11 +81,44 @@ const getAll = async() => {
   }
 }
 
+const growthPercentOnMonth = async() => {
+  try {
+    const now = moment()
+    const startThisMonth = now.clone().startOf('month').valueOf()
+    const startLastMonth = now.clone().subtract(1, 'month').startOf('month').valueOf()
+    const endLastMonth = now.clone().subtract(1, 'month').endOf('month').valueOf()
+
+    const cmtThisMonth = await GET_DB().collection(COMMENT_COLLECTION_NAME).countDocuments({
+      createdAt: { $gte: startThisMonth }
+    })
+
+    const cmtLastMonth = await GET_DB().collection(COMMENT_COLLECTION_NAME).countDocuments({
+      createdAt: { $gte: startLastMonth, $lte: endLastMonth }
+    })
+
+    let percentageDifference = 0
+    if (cmtLastMonth > 0) {
+      percentageDifference = ((cmtThisMonth - cmtLastMonth) / cmtLastMonth) * 100
+    } else if (cmtThisMonth > 0) {
+      percentageDifference = 100 // Nếu không có cmt trong tháng trước và có cmt trong tháng này
+    }
+    const result = {
+      lastMonth: cmtLastMonth,
+      thisMonth: cmtThisMonth,
+      percentageDifference: Number(percentageDifference.toFixed(2))
+    }
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const commentModel = {
   createNew,
   findOneById,
   getAll,
   deleteById,
   updateContentById,
-  COMMENT_COLLECTION_NAME
+  COMMENT_COLLECTION_NAME,
+  growthPercentOnMonth
 }

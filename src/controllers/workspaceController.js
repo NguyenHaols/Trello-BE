@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import { workspaceModel } from '~/models/workspaceModel'
 import { workspaceService } from '~/services/workspaceService'
 import { response } from '~/utils/response'
 
@@ -88,6 +89,24 @@ const getAll = async (req, res, next) => {
   }
 }
 
+const getGrowthPercentOnMonth = async(req, res, next) => {
+  try {
+    const result = await workspaceModel.growthPercentOnMonth()
+    return res.status(StatusCodes.OK).json(response(true,'Success',result))
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getCountOnMonth = async(req, res, next) => {
+  try {
+    const result = await workspaceModel.countWorkspaceOnMonth()
+    return res.status(StatusCodes.OK).json(response(true,'Success',result))
+  } catch (error) {
+    next(error)
+  }
+}
+
 // const findManagerById = async (req, res, next, userId, workspaceId) => {
 //   try {
 //     const isManager = await workspaceService.findManagerById(
@@ -107,5 +126,7 @@ export const workspaceController = {
   update,
   deleteWorkspace,
   getAll,
-  findOneById
+  findOneById,
+  getGrowthPercentOnMonth,
+  getCountOnMonth
 }

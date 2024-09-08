@@ -5,6 +5,7 @@ import { GET_DB } from '~/config/mongodb'
 import { boardModel } from './boardModel'
 import { userModel } from './userModel'
 import { memberModel } from './memberModel'
+import moment from 'moment'
 
 const WORKSPACE_COLLECTION_NAME = 'workspaces'
 const WORKSPACE_COLLECTION_SCHEMA = Joi.object({
@@ -94,9 +95,6 @@ const deleteOneById = async (id) => {
       .deleteOne({
         _id: new ObjectId(id)
       })
-  console.log('🚀 ~ deleteOneById ~ id:', id)
-      console.log('🚀 ~ deleteOneById ~ result:', result)
-      
     return result
   } catch (error) {
     throw new Error(error)
@@ -241,6 +239,66 @@ const findManagerById = async (userId, workspaceId) => {
   }
 }
 
+const growthPercentOnMonth = async() => {
+  try {
+    const now = moment()
+    const startThisMonth = now.clone().startOf('month').valueOf()
+    const startLastMonth = now.clone().subtract(1, 'month').startOf('month').valueOf()
+    const endLastMonth = now.clone().subtract(1, 'month').endOf('month').valueOf()
+
+    const workspaceThisMonth = await GET_DB().collection(WORKSPACE_COLLECTION_NAME).countDocuments({
+      createdAt: { $gte: startThisMonth }
+    })
+
+    const workspaceLastMonth = await GET_DB().collection(WORKSPACE_COLLECTION_NAME).countDocuments({
+      createdAt: { $gte: startLastMonth, $lte: endLastMonth }
+    })
+
+    let percentageDifference = 0
+    if (workspaceLastMonth > 0) {
+      percentageDifference = ((workspaceThisMonth - workspaceLastMonth) / workspaceLastMonth) * 100
+    } else if (workspaceThisMonth > 0) {
+      percentageDifference = 100 // Nếu không có user trong tháng trước và có user trong tháng này
+    }
+    const result = {
+      lastMonth: workspaceLastMonth,
+      thisMonth: workspaceThisMonth,
+      percentageDifference: Number(percentageDifference.toFixed(2))
+    }
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const countWorkspaceOnMonth = async () => {
+  try {
+    const now = moment()
+    // Khởi tạo mảng 12 tháng với giá trị count ban đầu là 0
+    const months = Array.from({ length: 12 }, (_, i) => ({ month: i + 1, count: 0 }))
+
+    // Lặp qua từng tháng trong năm
+    for (let i = 0; i < 12; i++) {
+      const startOfMonth = now.clone().month(i).startOf('month').valueOf() // Thời điểm bắt đầu của tháng i
+      const endOfMonth = now.clone().month(i).endOf('month').valueOf() // Thời điểm kết thúc của tháng i
+
+      // Đếm số lượng workspace được tạo trong khoảng thời gian của tháng i
+      const workspaceCount = await GET_DB()
+        .collection(WORKSPACE_COLLECTION_NAME)
+        .countDocuments({
+          createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+        })
+
+      // Gán số lượng workspace cho tháng tương ứng
+      months[i].count = workspaceCount
+    }
+
+    return months
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const workspaceModel = {
   WORKSPACE_COLLECTION_NAME,
   findOneById,
@@ -251,5 +309,7 @@ export const workspaceModel = {
   update,
   deleteOneById,
   getAll,
-  findManagerById
+  findManagerById,
+  growthPercentOnMonth,
+  countWorkspaceOnMonth
 }

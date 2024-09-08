@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import { commentModel } from '~/models/commentModel'
 import { commentService } from '~/services/commentService'
 import { response } from '~/utils/response'
 
@@ -48,9 +49,19 @@ const getAll = async(req, res, next) => {
   }
 }
 
+const getGrowthPercentOnMonth = async(req, res, next) => {
+  try {
+    const result = await commentModel.growthPercentOnMonth()
+    return res.status(StatusCodes.OK).json(response(true,'Success',result))
+  } catch (error) {
+    next()
+  }
+}
+
 export const commentController = {
   createNew,
   getAll,
   deleteOneById,
-  updateContentById
+  updateContentById,
+  getGrowthPercentOnMonth
 }

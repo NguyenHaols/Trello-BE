@@ -105,7 +105,6 @@ const update = async (reqbody) => {
 const deleteOneById = async (reqbody) => {
   try {
     const result = await workspaceModel.deleteOneById(reqbody._id)
-    console.log('🚀 ~ deleteOneById ~ result:', result)
     if (result.acknowledged && result.deletedCount > 0) {
       // tim cac board chua workspaceId
       const boards = await boardModel.findBoardsByWorkspaceId(reqbody._id)

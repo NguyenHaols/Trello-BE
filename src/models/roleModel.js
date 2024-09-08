@@ -41,6 +41,7 @@ const getAll = async () => {
   }
 }
 
+
 export const roleModel = {
   ROLE_COLLECTION_NAME,
   ROLE_COLLECTION_SCHEMA,

@@ -1,5 +1,6 @@
 import express from 'express'
 import { commentController } from '~/controllers/commentController'
+import { verifyTokenAdmin } from '~/middlewares/verifyToken'
 import { commentValidation } from '~/validations/commentValidation'
 
 
@@ -16,5 +17,8 @@ Router.route('/postComment')
 
 Router.route('/updateContent')
   .post(commentController.updateContentById)
+
+Router.route('/getPercentOnMonth').get(verifyTokenAdmin, commentController.getGrowthPercentOnMonth)
+
 
 export const commentRoute = Router

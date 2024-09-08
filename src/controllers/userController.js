@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
 import { userModel } from '~/models/userModel'
 import bcrypt from 'bcrypt'
+import { ObjectId } from 'mongodb'
+import { response } from '~/utils/response'
 
 const getAll = async (req, res, next) => {
   try {
@@ -81,6 +83,39 @@ const login = async (req, res, next) => {
     }
 
     res.status(StatusCodes.OK).json({ user, accessToken })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const loginAdmin = async (req, res, next) => {
+  try {
+    let accessToken = null
+    let refreshToken = null
+    const roleAdmin = '66136281a82158d0e227adcf'
+    const user = await userService.checkLogin(req.body)
+    if (user._id && (user.roleId.toString() === roleAdmin)) {
+      accessToken = generateAccessToken(user, req.body)
+      refreshToken = generateRefreshToken(user)
+      res.cookie('refreshTokenAdmin', refreshToken, {
+        httpOnly: false,
+        path: '/',
+        secure: true,
+        sameSite: 'None',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+      res.cookie('accessTokenAdmin', accessToken, {
+        httpOnly: false,
+        path: '/',
+        secure: true,
+        sameSite: 'None',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+      res.status(StatusCodes.OK).json({ user, accessToken })
+    } else {
+      res.status(StatusCodes.FORBIDDEN).json(response(false,'You don\'t have permission'))
+    }
+
   } catch (error) {
     next(error)
   }
@@ -182,6 +217,15 @@ const updatePassword = async (req, res, next) => {
   }
 }
 
+const getGrowthPercentOnMonth = async(req, res, next) => {
+  try {
+    const result = await userModel.growthPercentOnMonth()
+    return res.status(StatusCodes.OK).json(response(true,'Success',result))
+  } catch (error) {
+    next()
+  }
+}
+
 export const userController = {
   createNew,
   findOneByEmail,
@@ -194,5 +238,7 @@ export const userController = {
   updatePassword,
   addStarredBoard,
   removeStarredBoard,
-  recoverPassword
+  recoverPassword,
+  loginAdmin,
+  getGrowthPercentOnMonth
 }

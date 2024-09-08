@@ -33,4 +33,10 @@ Router.route('/delete').post(verifyTokenUser, workspaceController.deleteWorkspac
 
 Router.route('/getAll').get(verifyTokenAdmin, workspaceController.getAll)
 
+Router.route('/getPercentOnMonth').get(verifyTokenAdmin, workspaceController.getGrowthPercentOnMonth)
+
+Router.route('/getCountOnMonth').get(verifyTokenAdmin, workspaceController.getCountOnMonth)
+
+
+
 export const workspaceRoute = Router

@@ -4,6 +4,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
+import moment from 'moment'
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
@@ -155,6 +156,38 @@ const updatePassword = async (email, newPassword) => {
   }
 }
 
+const growthPercentOnMonth = async() => {
+  try {
+    const now = moment()
+    const startThisMonth = now.clone().startOf('month').valueOf()
+    const startLastMonth = now.clone().subtract(1, 'month').startOf('month').valueOf()
+    const endLastMonth = now.clone().subtract(1, 'month').endOf('month').valueOf()
+
+    const userThisMonth = await GET_DB().collection(USER_COLLECTION_NAME).countDocuments({
+      createdAt: { $gte: startThisMonth }
+    })
+
+    const userLastMonth = await GET_DB().collection(USER_COLLECTION_NAME).countDocuments({
+      createdAt: { $gte: startLastMonth, $lte: endLastMonth }
+    })
+
+    let percentageDifference = 0
+    if (userLastMonth > 0) {
+      percentageDifference = ((userThisMonth - userLastMonth) / userLastMonth) * 100
+    } else if (userThisMonth > 0) {
+      percentageDifference = 100 // Nếu không có user trong tháng trước và có user trong tháng này
+    }
+    const result = {
+      lastMonth: userLastMonth,
+      thisMonth: userThisMonth,
+      percentageDifference: Number(percentageDifference.toFixed(2))
+    }
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const userModel = {
   createNew,
   findOneById,
@@ -163,5 +196,6 @@ export const userModel = {
   updateUser,
   updatePassword,
   addStarredBoard,
-  removeStarredBoard
+  removeStarredBoard,
+  growthPercentOnMonth
 }
