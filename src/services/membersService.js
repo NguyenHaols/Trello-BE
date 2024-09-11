@@ -33,7 +33,7 @@ const getMembersByWorkspaceId = async(workspaceId) => {
     if (members.length <= 0 ) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Can\'t find any data, check workspace Id'
+        'Can\'t find any data'
       )
     }
     return members

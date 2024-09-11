@@ -12,6 +12,7 @@ import { roleRoute } from './roleRoute'
 import { memberRoute } from './memberRoute'
 import { auth20 } from './authRoute'
 import { notificationsRoute } from './notificationRoute'
+import { reportRoute } from './reportRoute'
 
 
 const Router = express.Router()
@@ -41,5 +42,8 @@ Router.use('/workspace/member', memberRoute)
 Router.use('/auth', auth20)
 
 Router.use('/notifications', notificationsRoute)
+
+Router.use('/report', reportRoute)
+
 
 export const APIs_V1 = Router
