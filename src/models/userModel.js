@@ -188,6 +188,15 @@ const growthPercentOnMonth = async() => {
   }
 }
 
+const deleteOne = async(id) => {
+  try {
+    const result = GET_DB().collection(USER_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const userModel = {
   createNew,
   findOneById,
@@ -197,5 +206,6 @@ export const userModel = {
   updatePassword,
   addStarredBoard,
   removeStarredBoard,
-  growthPercentOnMonth
+  growthPercentOnMonth,
+  deleteOne
 }

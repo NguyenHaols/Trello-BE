@@ -1,8 +1,6 @@
 import nodemailer from 'nodemailer'
 import { userModel } from '~/models/userModel'
 import bcrypt from 'bcrypt'
-import { codeRecoverService } from './codeRecoverPw'
-import { codeRecoverModel } from '~/models/codeRecoverPw'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { generateAccessToken } from '~/utils/Token'

@@ -31,11 +31,11 @@ Router.route('/update').post(
 
 Router.route('/delete').post(verifyTokenUser, workspaceController.deleteWorkspace)
 
-Router.route('/getAll').get(verifyTokenAdmin, workspaceController.getAll)
+Router.route('/getAll').get(workspaceController.getAll)
 
-Router.route('/getPercentOnMonth').get(verifyTokenAdmin, workspaceController.getGrowthPercentOnMonth)
+Router.route('/getPercentOnMonth').get( workspaceController.getGrowthPercentOnMonth)
 
-Router.route('/getCountOnMonth').get(verifyTokenAdmin, workspaceController.getCountOnMonth)
+Router.route('/getCountOnMonth').get(workspaceController.getCountOnMonth)
 
 
 

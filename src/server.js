@@ -62,7 +62,7 @@ const START_SERVER = () => {
       const userReceiver = await userService.findOneByEmail(data.emailInvite)
       const workspace = await workspaceModel.findOneById(data.workspaceId)
       const invitedEmail = getUserOnline(data.emailInvite)
-      const message = `You have been added to workspace ${workspace ? workspace.title : ''}`
+      const message = 'You have been added to workspace of'
       const newNotification = {
         senderId : data.inviterId,
         receiverId : userReceiver._id.toString(),
@@ -79,7 +79,7 @@ const START_SERVER = () => {
       const member = getUserOnline(data.emailRemove)
       const workspace = await workspaceModel.findOneById(data.workspaceId)
       const userReceiver = await userService.findOneByEmail(data.emailRemove)
-      const message = `You have been remove from workspace ${workspace ? workspace.title : ''}`
+      const message = 'You have been remove from workspace of'
       const newNotification = {
         senderId : data.senderId,
         receiverId : userReceiver._id.toString(),
@@ -109,7 +109,7 @@ const START_SERVER = () => {
   app.use(errorHandlingMiddleware)
 
   app.get('/', (req, res) => {
-    res.end('<h1>Hello World!</h1><hr>')
+    res.end('<h1>BACK END SERVER</h1><hr>')
   })
 
   if (env.BUILD_MODE === 'production') {

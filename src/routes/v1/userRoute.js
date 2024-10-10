@@ -38,7 +38,7 @@ Router.route('/removeStarred').post(userController.removeStarredBoard)
 
 Router.route('/recoverPassword').post(userController.recoverPassword)
 
-Router.route('/getPercentOnMonth').get(verifyTokenAdmin, userController.getGrowthPercentOnMonth)
+Router.route('/getPercentOnMonth').get(userController.getGrowthPercentOnMonth)
 
 
 export const userRoute = Router

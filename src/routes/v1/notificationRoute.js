@@ -11,8 +11,6 @@ Router.route('/create')
 Router.route('/getNotificationsByReceiver')
   .post(verifyTokenUser, notificationsController.findByReceiverId)
 
-Router.route('/getNotificationsByReceiver')
-  .post(verifyTokenUser, notificationsController.findByReceiverId)
 
 Router.route('/setIsRead')
   .post(verifyTokenUser, notificationsController.setIsRead)

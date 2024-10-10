@@ -19,7 +19,6 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   members: Joi.array().items(Joi.object().unknown(true).default).default([]),
   tasks: Joi.array().items(Joi.object().unknown(true).default).default([]),
   attachs: Joi.array().items(Joi.object().unknown(true).default).default([]),
-  comments: Joi.array().items(Joi.object().unknown(true).default).default([]),
   deadline: Joi.date().timestamp('javascript').default(() => new Date(Date.now() + 24 * 60 * 60 * 1000)),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -186,6 +185,7 @@ const addTask = async (cardId, newTask) => {
     if (!newTask._id) {
       newTask._id = new ObjectId()
     }
+    newTask.deadline = new Date()
     const result = await GET_DB()
       .collection(CARD_COLLECTION_NAME)
       .findOneAndUpdate(

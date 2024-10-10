@@ -7,7 +7,6 @@ import { uploadImage } from './uploadImage'
 import { workspaceRoute } from './workspaceRoute'
 import { commentRoute } from './commentRoute'
 import { emailRoute } from './emailRoute'
-import { codeRecoverRoute } from './codeRecoverRoute'
 import { roleRoute } from './roleRoute'
 import { memberRoute } from './memberRoute'
 import { auth20 } from './authRoute'
@@ -32,8 +31,6 @@ Router.use('/workspaces', workspaceRoute)
 Router.use('/comments', commentRoute)
 
 Router.use('/email', emailRoute)
-
-Router.use('/codeRecover', codeRecoverRoute)
 
 Router.use('/roles', roleRoute)
 

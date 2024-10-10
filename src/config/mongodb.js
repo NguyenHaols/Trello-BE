@@ -1,4 +1,3 @@
-
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import { env } from '~/config/environment'
 let trelloDatabaseInstance = null
@@ -24,5 +23,3 @@ export const GET_DB = () => {
   if (!trelloDatabaseInstance) throw new Error('You have to connect database first')
   return trelloDatabaseInstance
 }
-
-

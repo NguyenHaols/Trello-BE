@@ -18,7 +18,7 @@ Router.route('/postComment')
 Router.route('/updateContent')
   .post(commentController.updateContentById)
 
-Router.route('/getPercentOnMonth').get(verifyTokenAdmin, commentController.getGrowthPercentOnMonth)
+Router.route('/getPercentOnMonth').get(commentController.getGrowthPercentOnMonth)
 
 
 export const commentRoute = Router
