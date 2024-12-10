@@ -1,9 +1,9 @@
 import { StatusCodes } from 'http-status-codes'
-import { commentModel } from '~/models/commentModel'
-import { commentService } from '~/services/commentService'
-import { response } from '~/utils/response'
+import { commentService } from '../services/commentService'
+import { response } from '../utils/response'
+import { commentModel } from '../models/commentModel'
 
-const createNew = async(req, res, next) => {
+const createNew = async (req, res, next) => {
   try {
     const createdComment = await commentService.createNew(req.body)
     res.status(StatusCodes.CREATED).json(createdComment)
@@ -12,35 +12,46 @@ const createNew = async(req, res, next) => {
   }
 }
 
-const deleteOneById = async(req, res, next) => {
+const deleteOneById = async (req, res, next) => {
   try {
     const result = await commentService.deleteById(req.body.commentId)
     if (result) {
-      res.status(StatusCodes.OK).json(response(true,'Delete successfully'))
+      res.status(StatusCodes.OK).json(response(true, 'Delete successfully'))
     } else {
-      res.status(StatusCodes.BAD_REQUEST).json({ success:false, message:'Delete failure, this comment may no longer exist' })
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({
+          success: false,
+          message: 'Delete failure, this comment may no longer exist'
+        })
     }
   } catch (error) {
     next(error)
   }
 }
 
-const updateContentById = async(req, res, next) => {
+const updateContentById = async (req, res, next) => {
   try {
     const commentId = req.body.commentId
     const newContent = req.body.newContent
     const result = await commentService.updateContentById(commentId, newContent)
     if (result) {
-      res.status(StatusCodes.OK).json(response(true, 'Update successfully',result))
+      res
+        .status(StatusCodes.OK)
+        .json(response(true, 'Update successfully', result))
     } else {
-      res.status(StatusCodes.BAD_REQUEST).json(response(false,'Update failure, this comment may no longer exist'))
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(
+          response(false, 'Update failure, this comment may no longer exist')
+        )
     }
   } catch (error) {
     next(error)
   }
 }
 
-const getAll = async(req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
     const comments = await commentService.getAll()
     res.status(StatusCodes.OK).json(comments)
@@ -49,10 +60,10 @@ const getAll = async(req, res, next) => {
   }
 }
 
-const getGrowthPercentOnMonth = async(req, res, next) => {
+const getGrowthPercentOnMonth = async (req, res, next) => {
   try {
     const result = await commentModel.growthPercentOnMonth()
-    return res.status(StatusCodes.OK).json(response(true,'Success',result))
+    return res.status(StatusCodes.OK).json(response(true, 'Success', result))
   } catch (error) {
     next()
   }

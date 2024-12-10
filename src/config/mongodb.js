@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from 'mongodb'
-import { env } from '~/config/environment'
+import { env } from '../config/environment'
 let trelloDatabaseInstance = null
 
 const mongoClientInstance = new MongoClient(env.MONGODB_URI, {
@@ -20,6 +20,7 @@ export const CLOSE_DB = async () => {
 }
 
 export const GET_DB = () => {
-  if (!trelloDatabaseInstance) throw new Error('You have to connect database first')
+  if (!trelloDatabaseInstance)
+    throw new Error('You have to connect database first')
   return trelloDatabaseInstance
 }

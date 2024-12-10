@@ -1,9 +1,8 @@
 import { StatusCodes } from 'http-status-codes'
-import { boardService } from '~/services/boardService'
+import { boardService } from '../services/boardService'
 
-const createNew = async(req, res, next) => {
+const createNew = async (req, res, next) => {
   try {
-
     const createBoard = await boardService.createNew(req.body)
 
     res.status(StatusCodes.CREATED).json(createBoard)
@@ -12,9 +11,8 @@ const createNew = async(req, res, next) => {
   }
 }
 
-const getDetail= async(req, res, next) => {
+const getDetail = async (req, res, next) => {
   try {
-
     const boardId = req.params.id
     const board = await boardService.getDetail(boardId)
 
@@ -24,9 +22,8 @@ const getDetail= async(req, res, next) => {
   }
 }
 
-const update = async(req, res, next) => {
+const update = async (req, res, next) => {
   try {
-
     const boardId = req.params.id
     const updatedBoard = await boardService.update(boardId, req.body)
 
@@ -36,7 +33,7 @@ const update = async(req, res, next) => {
   }
 }
 
-const moveCardToDifferentColumn = async(req, res, next) => {
+const moveCardToDifferentColumn = async (req, res, next) => {
   try {
     const result = await boardService.moveCardToDifferentColumn(req.body)
 
@@ -46,7 +43,7 @@ const moveCardToDifferentColumn = async(req, res, next) => {
   }
 }
 
-const deleteBoard = async(req, res, next) => {
+const deleteBoard = async (req, res, next) => {
   try {
     const result = await boardService.deleteBoard(req.body)
     res.status(StatusCodes.OK).json(result)
@@ -55,7 +52,7 @@ const deleteBoard = async(req, res, next) => {
   }
 }
 
-export const boardController= {
+export const boardController = {
   createNew,
   getDetail,
   update,

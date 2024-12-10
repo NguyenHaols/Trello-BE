@@ -1,4 +1,4 @@
-import { emailService } from '~/services/emailService'
+import { emailService } from '../services/emailService'
 
 const { StatusCodes } = require('http-status-codes')
 
@@ -10,7 +10,6 @@ const sendEmail = async (req, res, next) => {
     next(error)
   }
 }
-
 
 export const emailController = {
   sendEmail

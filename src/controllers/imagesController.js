@@ -1,14 +1,14 @@
 import { StatusCodes } from 'http-status-codes'
-import cloudinary from '~/config/cloudinaryConfig'
 import mime from 'mime-types'
+import cloudinary from '../config/cloudinaryConfig'
 
-const upload = async(req, res, next) => {
+const upload = async (req, res, next) => {
   try {
     const image = req.file.path
     const result = await cloudinary.uploader.upload(image)
     const uploadedImage = {
-      url:result.secure_url,
-      publicId:result.public_id
+      url: result.secure_url,
+      publicId: result.public_id
     }
     return res.status(StatusCodes.OK).json({
       message: 'Upload successfully',
@@ -19,7 +19,7 @@ const upload = async(req, res, next) => {
   }
 }
 
-const remove = async(req, res, next) => {
+const remove = async (req, res, next) => {
   try {
     const publicId = req.params.id
     const result = await cloudinary.uploader.destroy(publicId)
@@ -27,7 +27,7 @@ const remove = async(req, res, next) => {
       throw new Error('Delete image failed')
     }
     res.status(StatusCodes.OK).json({
-      message:'Delete successfully',
+      message: 'Delete successfully',
       data: result
     })
   } catch (error) {
@@ -35,11 +35,13 @@ const remove = async(req, res, next) => {
   }
 }
 
-const uploadFile = async(req, res, next) => {
+const uploadFile = async (req, res, next) => {
   try {
     const file = req.file.path
     const fileExtension = mime.extension(req.file.mimetype)
-    const result = await cloudinary.uploader.upload(file, { resource_type: 'auto' })
+    const result = await cloudinary.uploader.upload(file, {
+      resource_type: 'auto'
+    })
     const uploadedFile = {
       url: result.secure_url,
       publicId: `${result.public_id}.${fileExtension}`,
@@ -55,7 +57,7 @@ const uploadFile = async(req, res, next) => {
   }
 }
 
-const removeFile = async(req, res, next) => {
+const removeFile = async (req, res, next) => {
   try {
     const publicId = req.params.id
     const result = await cloudinary.uploader.destroy(publicId)
