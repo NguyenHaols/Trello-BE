@@ -5,54 +5,62 @@ import { userService } from './services/userService'
 import { userModel } from './models/userModel'
 import { generateAccessToken } from './utils/Token'
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:1302/v1/auth/google/callback'
-},
-async function(accessToken, refreshToken, profile, cb) {
-  // console.log(profile)
-  if (profile?.id) {
-    const email = profile.emails[0]?.value
-    let user = await userModel.findOneByEmail(email)
-    if (!user) {
-      const data = {
-        username: profile.displayName,
-        email: email,
-        avatar: profile.photos[0].value,
-        password: '123456'
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL:
+        'https://trello-project-tau.vercel.app/v1/auth/google/callback'
+    },
+    async function (accessToken, refreshToken, profile, cb) {
+      // console.log(profile)
+      if (profile?.id) {
+        const email = profile.emails[0]?.value
+        let user = await userModel.findOneByEmail(email)
+        if (!user) {
+          const data = {
+            username: profile.displayName,
+            email: email,
+            avatar: profile.photos[0].value,
+            password: '123456'
+          }
+          user = await userService.createNew(data)
+        }
+        const token = generateAccessToken(user)
+        return cb(null, { profile, token })
       }
-      user = await userService.createNew(data)
+      return cb(null, false)
     }
-    const token = generateAccessToken(user)
-    return cb(null, { profile, token })
-  }
-  return cb(null, false)
-}
-))
+  )
+)
 
-passport.use(new FacebookStrategy({
-  clientID: process.env.FACEBOOK_APP_ID,
-  clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: 'http://localhost:1302/v1/auth/facebook/callback',
-  profileFields: ['id', 'email', 'photos', 'displayName']
-},
-async function(accessToken, refreshToken, profile, cb) {
-  if (profile?.id) {
-    const email = profile.emails[0]?.value
-    let user = await userModel.findOneByEmail(email)
-    if (!user) {
-      const data = {
-        username: profile.displayName,
-        email: email,
-        avatar: profile.photos[0].value,
-        password: '123456'
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_APP_ID,
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+      callbackURL:
+        'https://trello-project-tau.vercel.app/v1/auth/facebook/callback',
+      profileFields: ['id', 'email', 'photos', 'displayName']
+    },
+    async function (accessToken, refreshToken, profile, cb) {
+      if (profile?.id) {
+        const email = profile.emails[0]?.value
+        let user = await userModel.findOneByEmail(email)
+        if (!user) {
+          const data = {
+            username: profile.displayName,
+            email: email,
+            avatar: profile.photos[0].value,
+            password: '123456'
+          }
+          user = await userService.createNew(data)
+        }
+        const token = generateAccessToken(user)
+        return cb(null, { profile, token })
       }
-      user = await userService.createNew(data)
+      return cb(null, false)
     }
-    const token = generateAccessToken(user)
-    return cb(null, { profile, token })
-  }
-  return cb(null, false)
-}
-))
+  )
+)
