@@ -36,7 +36,7 @@ const findOneByEmail = async (req, res, next) => {
   }
 }
 
-const recoverPassword = async(req, res, next) => {
+const recoverPassword = async (req, res, next) => {
   try {
     const token = req.body.token
     const newPassword = req.body.newPassword
@@ -44,13 +44,14 @@ const recoverPassword = async(req, res, next) => {
       if (err) {
         console.log(err)
       } else {
-
         const salt = await bcrypt.genSalt(10)
         const hashed = await bcrypt.hash(newPassword, salt)
         const password = hashed
         const findUser = await userService.findOneById(user.id)
         const result = await userModel.updatePassword(findUser.email, password)
-        res.status(StatusCodes.OK).json({success:true, message:'Update password successully'})
+        res
+          .status(StatusCodes.OK)
+          .json({ success: true, message: 'Update password successully' })
       }
     })
   } catch (error) {
@@ -69,20 +70,20 @@ const login = async (req, res, next) => {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: false,
         path: '/',
-        secure: true,
+        secure: false,
         sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000
       })
       res.cookie('accessToken', accessToken, {
         httpOnly: false,
         path: '/',
-        secure: true,
+        secure: false,
         sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000
       })
     }
 
-    res.status(StatusCodes.OK).json({ user, accessToken })
+    return res.status(StatusCodes.OK).json({ user, accessToken })
   } catch (error) {
     next(error)
   }
@@ -94,7 +95,7 @@ const loginAdmin = async (req, res, next) => {
     let refreshToken = null
     const roleAdmin = '66136281a82158d0e227adcf'
     const user = await userService.checkLogin(req.body)
-    if (user._id && (user.roleId.toString() === roleAdmin)) {
+    if (user._id && user.roleId.toString() === roleAdmin) {
       accessToken = generateAccessToken(user, req.body)
       refreshToken = generateRefreshToken(user)
       res.cookie('refreshTokenAdmin', refreshToken, {
@@ -113,9 +114,10 @@ const loginAdmin = async (req, res, next) => {
       })
       res.status(StatusCodes.OK).json({ user, accessToken })
     } else {
-      res.status(StatusCodes.FORBIDDEN).json(response(false,'You don\'t have permission'))
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(response(false, "You don't have permission"))
     }
-
   } catch (error) {
     next(error)
   }
@@ -217,10 +219,10 @@ const updatePassword = async (req, res, next) => {
   }
 }
 
-const getGrowthPercentOnMonth = async(req, res, next) => {
+const getGrowthPercentOnMonth = async (req, res, next) => {
   try {
     const result = await userModel.growthPercentOnMonth()
-    return res.status(StatusCodes.OK).json(response(true,'Success',result))
+    return res.status(StatusCodes.OK).json(response(true, 'Success', result))
   } catch (error) {
     next()
   }

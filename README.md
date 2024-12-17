@@ -1,20 +1,24 @@
+WEBSITE QUẢN LÝ CÔNG VIỆC, THỜI GIAN
 
+Mô tả: Đây là website giúp người dùng quản lý, lên công việc thông qua các bảng, cột và thành viên, thời gian...
 
-* nodejs = v18.16.0
-* npm = v9.8.1
-* yarn = v1.22.19
+Chức năng:
+-Thêm, sửa, xóa, cập nhật công việc
+-Thêm ảnh, lưu trữ ảnh
+-Quản lý thành viên
+-Thông báo thời gian thực
+-Bình luận
+-Chế độ dark mode/light mode
+-Chế độ 2 ngôn ngữ tiếng anh và tiếng việt
+-Kéo thả UI công việc
 
-* "express": "^4.18.2"
-* "nodemon": "^3.0.1"
-* "eslint": "^8.47.0"
+Công nghệ sử dụng:
+-React
+-Material UI
+-Nodejs/expressJs
 
-* "@babel/runtime": "^7.22.10"
-* "@babel/cli": "^7.22.10"
-* "@babel/core": "^7.22.10"
-* "@babel/eslint-parser": "^7.22.10"
-* "@babel/node": "^7.22.10"
-* "@babel/plugin-transform-runtime": "^7.22.10"
-* "@babel/preset-env": "^7.22.10"
-* "babel-plugin-module-resolver": "^5.0.0"
-```
-
+Công cụ và database:
+-Git
+-source tree
+-Post man
+-Mongodb

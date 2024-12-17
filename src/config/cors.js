@@ -7,8 +7,8 @@ export const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'http://localhost:5173',
-      'https://trello-project-tau.vercel.app',
-      'https://trello-be.vercel.app'
+      'https://trello-project-five.vercel.app',
+      'https://trello-project-42esrp36g-haos-projects-121cf72c.vercel.app'
     ]
     // Cho phép việc gọi API bằng POSTMAN trên môi trường dev,
     // Thông thường khi sử dụng postman thì cái origin sẽ có giá trị là undefined
@@ -37,7 +37,16 @@ export const corsOptions = {
 
   // Some legacy browsers (IE11, various SmartTVs) choke on 204
   optionsSuccessStatus: 200,
-
-  // CORS sẽ cho phép nhận cookies từ request
-  credentials: true
+  credentials: true,
+  methods: 'GET,POST,PUT,DELETE', // Các phương thức được phép
+  allowedHeaders: 'Content-Type,Authorization'
 }
+
+// export const corsOptions = {
+//   origin: function (origin, callback) {
+//     callback(null, true) // Cho phép tất cả các domain
+//   },
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   optionsSuccessStatus: 200, // Cho các trình duyệt cũ xử lý HTTP 204
+//   credentials: true // Cho phép nhận cookies từ request
+// }
